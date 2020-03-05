@@ -1,0 +1,2 @@
+\babel@toc {spanish}{}
+\contentsline {chapter}{\numberline {1}Desarrollo de un agente basado en búsqueda heurística para el entorno GVGAI}{2}{chapter.1}% 
