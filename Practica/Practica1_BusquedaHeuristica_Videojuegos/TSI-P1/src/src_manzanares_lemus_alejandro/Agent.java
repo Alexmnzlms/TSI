@@ -1,15 +1,14 @@
 package src_manzanares_lemus_alejandro;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import core.game.Observation;
 import core.game.StateObservation;
 import core.player.AbstractPlayer;
 import ontology.Types;
-import ontology.Types.ACTIONS;
 import tools.ElapsedCpuTimer;
 import tools.Vector2d;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Agent extends AbstractPlayer {
   Vector2d fescala;
@@ -31,9 +30,26 @@ public class Agent extends AbstractPlayer {
 
   }
 
+  public ArrayList<Types.ACTIONS> A_estrella (StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
+    ArrayList<Node> abiertos = new ArrayList<Node>();
+    ArrayList<Node> cerrados = new ArrayList<Node>();
+    ArrayList<Types.ACTIONS> path = new ArrayList<Types.ACTIONS>();
+    Vector2d pos_inicial = new Vector2d((stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y)
+    Nodo padre = new Nodo(pos_inicial);
+    abiertos.add(padre);
+
+    while(true){
+
+    }
+    return path;
+  }
+
   public Types.ACTIONS act( StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
 
-    Vector2d avatar =  new Vector2d(stateObs.getAvatarPosition().x / fescala.x,
+    A_estrella(stateObs,elapsedTimer);
+    return Types.ACTIONS.ACTION_NIL;
+
+    /*Vector2d avatar =  new Vector2d(stateObs.getAvatarPosition().x / fescala.x,
             stateObs.getAvatarPosition().y / fescala.y);
 
     //Probamos las cuatro acciones y calculamos la distancia del nuevo estado al portal.
@@ -71,7 +87,7 @@ public class Agent extends AbstractPlayer {
         return Types.ACTIONS.ACTION_RIGHT;
       default:
         return Types.ACTIONS.ACTION_NIL;
-    }
+    }*/
 
   }
 }

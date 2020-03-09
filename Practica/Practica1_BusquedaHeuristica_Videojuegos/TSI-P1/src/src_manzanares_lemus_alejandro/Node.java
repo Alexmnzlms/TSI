@@ -3,20 +3,17 @@ package src_manzanares_lemus_alejandro;
 import ontology.Types;
 import tools.Direction;
 import tools.Vector2d;
-import tools.pathfinder.Node;
 
-import java.util.ArrayList;
-
-public class Node implements Comparable<tools.pathfinder.Node> {
+public class Node{
 
     public double totalCost;
     public double estimatedCost;
-    public tools.pathfinder.Node parent;
+    public Node parent;
     public Vector2d position;
-    public Vector2d comingFrom;
+    public 
     public int id;
 
-    public Node(Vector2d pos)
+    public Node(Vector2d pos, int coste)
     {
         estimatedCost = 0.0f;
         totalCost = 1.0f;
@@ -25,8 +22,7 @@ public class Node implements Comparable<tools.pathfinder.Node> {
         id = ((int)(position.x) * 100 + (int)(position.y));
     }
 
-    @Override
-    public int compareTo(tools.pathfinder.Node n) {
+    public int compareTo(Node n) {
         if(this.estimatedCost + this.totalCost < n.estimatedCost + n.totalCost)
             return -1;
         if(this.estimatedCost + this.totalCost > n.estimatedCost + n.totalCost)
@@ -34,14 +30,13 @@ public class Node implements Comparable<tools.pathfinder.Node> {
         return 0;
     }
 
-    @Override
     public boolean equals(Object o)
     {
-        return this.position.equals(((tools.pathfinder.Node)o).position);
+        return this.position.equals(((Node)o).position);
     }
 
 
-    public void setMoveDir(tools.pathfinder.Node pre) {
+    public void setMoveDir(Node pre) {
 
         Direction action = Types.DNONE;
 
