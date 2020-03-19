@@ -37,8 +37,9 @@ public class Agent extends AbstractPlayer {
     Vector2d pos_inicial = new Vector2d((stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y)
     Nodo padre = new Nodo(pos_inicial);
     abiertos.add(padre);
+    boolean final = false;
 
-    while(true){
+    while(!final){
 
     }
     return path;
