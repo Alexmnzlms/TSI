@@ -24,30 +24,68 @@ public class Agent extends AbstractPlayer {
     portal = posiciones[0].get(0).position;
     portal.x = Math.floor(portal.x / fescala.x);
     portal.y = Math.floor(portal.y / fescala.y);
+
+    System.out.println("Portal_x:");
+    System.out.println(portal.x);
+    System.out.println("Portal_y:");
+    System.out.println(portal.y);
   }
 
   public void init(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
 
   }
 
-  public ArrayList<Types.ACTIONS> A_estrella (StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
+  public ArrayList<Types.ACTIONS> A_estrella (Vector2d destino, StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     ArrayList<Node> abiertos = new ArrayList<Node>();
     ArrayList<Node> cerrados = new ArrayList<Node>();
     ArrayList<Types.ACTIONS> path = new ArrayList<Types.ACTIONS>();
-    Vector2d pos_inicial = new Vector2d((stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y)
-    Nodo padre = new Nodo(pos_inicial);
+    Vector2d pos_inicial = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
+    Vector2d new_pos;
+    Node padre = new Node(stateObs, pos_inicial,destino,0,Types.ACTIONS.ACTION_RIGHT);
+    Node actual;
     abiertos.add(padre);
-    boolean final = false;
+    boolean fin= false;
 
-    while(!final){
+    while(!fin){
+      actual = abiertos.get(0);
+      ArrayList<Types.ACTIONS> acciones = stateObs.getAvailableActions();
+      for (int i = 0; i < acciones.size(); i++){
+        System.out.println(acciones.get(i));
+        if(acciones.get(i) != Types.ACTIONS.ACTION_USE) {
+          //Calcular aqui la nueva posicion en funcion de la accion
+          new_pos = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
+          if(acciones.get(i) == Types.ACTIONS.ACTION_UP){
+            new_pos.y = new_pos.y + 1;
+          } else if(acciones.get(i) == Types.ACTIONS.ACTION_DOWN){
+            new_pos.y = new_pos.y - 1;
+          } else if(acciones.get(i) == Types.ACTIONS.ACTION_RIGHT){
+            new_pos.x = new_pos.x + 1;
+          } else if(acciones.get(i) == Types.ACTIONS.ACTION_LEFT){
+            new_pos.x = new_pos.x - 1;
+          }
 
+          if(acciones.get(i) == actual.getAccion()) {
+            System.out.println("misma accion");
+            cerrados.add(new Node(stateObs, new_pos, destino, actual.getCoste_camino()+1.0,acciones.get(i)));
+          } else {
+            System.out.println("distinta accion");
+            cerrados.add(new Node(stateObs, new_pos, destino, actual.getCoste_camino()+2.0,acciones.get(i)));
+          }
+        }
+      }
+      for(int i = 0; i < cerrados.size(); i++) {
+        System.out.println("Accion del nodo:");
+        System.out.println(cerrados.get(i).getAccion());
+        System.out.println("Coste del nodo:");
+        System.out.println(cerrados.get(i).getCoste_total());
+      }
+      fin = true;
     }
     return path;
   }
 
   public Types.ACTIONS act( StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
-
-    A_estrella(stateObs,elapsedTimer);
+    A_estrella(portal,stateObs,elapsedTimer);
     return Types.ACTIONS.ACTION_NIL;
 
     /*Vector2d avatar =  new Vector2d(stateObs.getAvatarPosition().x / fescala.x,
