@@ -1,25 +1,39 @@
-\RequirePackage[title=Prácticas,
-                subtitle=Grupo\ 1,
-                author=Alejandro\ Manzanares\ Lemus,
-                organization=Técnicas\ de\ los\ Sistemas\ Inteligentes,
-                repository=,
-                language=spanish,
-                chapter=Práctica~,
-                subsection=,
-                showsubtitle,
-                toc
-               ]{aqademia}
+\documentclass[10pt]{report}
+
+% Language and input encoding
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+
+% Document settings
+
+\usepackage{titling}
+	\author{Alejandro Manzanares Lemus}
+	\title{Técnicas de los Sistemas Inteligentes}
+	\date{Marzo 29, 2020}
+
+
+
+\usepackage{hologo}
+\usepackage[title=\thetitle]{aqademia}
+\usepackage{float}
+\usepackage{minted}
+
+
 
 % Document composition
 
 \begin{document}
 
-\aqtitle%
+\aqtitlepage[nolicense]
+				{}
+            {}
+            {}
 
-\newpage
+\tableofcontents
 
-\input{../Practica1_BusquedaHeuristica_Videojuegos/doc/memoria1.tex}
-
+% Document files
+%\input{}
 
 
 \end{document}

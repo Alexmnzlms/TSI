@@ -1,44 +1,23 @@
 \ProvidesPackage{aqademia}
 
-\documentclass[10pt]{report}
+\RequirePackage{titling}
 
 % Package options
 
 \RequirePackage{etoolbox}
 \RequirePackage{kvoptions}
-	\DeclareBoolOption{license}
-	\DeclareBoolOption{showsubtitle}
-	\DeclareBoolOption{toc}
-	\DeclareStringOption[Appendix]{achapter}
-	\DeclareStringOption[]{author}
-	\DeclareStringOption[Part ]{chapter}
-	\DeclareStringOption[\today]{date}
-	\DeclareStringOption[img/]{graphics}
-	\DeclareStringOption[english]{language}
-	\DeclareStringOption[by-nc-sa]{lmodifier}
-	\DeclareStringOption[CC]{ltype}
-	\DeclareStringOption[4.0]{lversion}
-	\DeclareStringOption[]{organization}
-	\DeclareStringOption[\S]{section}
-	\DeclareStringOption[\S]{subsection}
-	\DeclareStringOption[\S]{subsubsection}
+	\DeclareStringOption[CC]       {ltype}
+	\DeclareStringOption[by-nc-sa] {lmodifier}
+	\DeclareStringOption[4.0]      {lversion}
+
+	\DeclareStringOption[\thetitle]{title}
 	\DeclareStringOption[3]{tab}
-	\DeclareStringOption[]{title}
-	\DeclareStringOption[]{repository}
-	\DeclareStringOption[]{subtitle}
+
 	\ProcessKeyvalOptions{aqademia}
+\RequirePackage{xifthen}
 
-% Language and input encoding
+% Licence options
 
-\RequirePackage[\aqademia@language]{babel}
-\RequirePackage[utf8]{inputenc}
-
-% Document title and licence
-
-\RequirePackage{titling}
-	\title{\aqademia@title}
-	\author{\aqademia@author}
-	\date{\aqademia@date}
 \RequirePackage[type={\aqademia@ltype},           % Createve commons
                 modifier = {\aqademia@lmodifier}, % Attribution - NonCommercial - ShareAlike
                 version  = {\aqademia@lversion}   % 4.0 International
@@ -74,10 +53,10 @@
 	\rhead{\theauthor}
 	\cfoot{\thepage}
 \RequirePackage{titlesec}
-	\titleformat{\chapter}[block]{\normalfont\bfseries\Huge}{\aqademia@chapter\thechapter:\\\ }{0pt}{}[]
-	\titleformat{\section}[block]{\normalfont\bfseries\huge}{\aqademia@section\thesection:\ }{0pt}{}[]
-	\titleformat{\subsection}[block]{\normalfont\bfseries\Large}{\aqademia@subsection\thesubsection:\ }{0pt}{}[]
-	\titleformat{\subsubsection}[block]{\normalfont\bfseries\large}{\aqademia@subsubsection\thesubsubsection:\ }{0pt}{}[]
+	\titleformat{\chapter}[block]{\normalfont\bfseries\huge}{Apartado \thechapter:\\}{0pt}{}[]
+	\titleformat{\section}[block]{\normalfont\bfseries\huge}{\S\thesection: }{0pt}{}[]
+	\titleformat{\subsection}[block]{\normalfont\bfseries\Large}{\S\thesubsection: }{0pt}{}[]
+	\titleformat{\subsubsection}[block]{\normalfont\bfseries\large}{\S\thesubsubsection: }{0pt}{}[]
 	\titlespacing*{\chapter}{0pt}{0pt}{30pt}
 \RequirePackage{hyperref}
 	\hypersetup{colorlinks = true,
@@ -87,17 +66,11 @@
 	           }
 \RequirePackage[toc,page]{appendix}
 \RequirePackage{csquotes}
-\RequirePackage{natbib}
 \RequirePackage{parskip}
 \RequirePackage{url}
 
 % Colour and graphics settings
 
-\RequirePackage{graphicx}
-	\graphicspath{{\aqademia@graphics}}
-\RequirePackage{tikz}
-	\RequirePackage{tikz-qtree}
-	\RequirePackage{pgfplots}
 \RequirePackage{xcolor}
 	\definecolor{listing-background} {HTML} {f7f7f7}
 	\definecolor{listing-numbers}    {HTML} {8e8e8e}
@@ -163,35 +136,66 @@
 %	\aqtitle -> Render the title page
 %	\code -> Print text in monospaced font its size scaled down to the regular font size
 
-\newcommand{\aqappendices}{\setcounter{chapter}{0}
-                           \renewcommand{\thesection}{\MakeUppercase{\alph{chapter}}.\arabic{section}}
-                           \titleformat{\chapter}[block]{\normalfont\bfseries\Huge}{\aqademia@achapter\ \MakeUppercase{\alph{chapter}}:\ }{0pt}{}[]
-                           \titleformat{\section}[block]{\normalfont\bfseries\Large}{\S\ \thesection:\ }{0pt}{}[]
-                           \titleformat{\subsection}[block]{\normalfont\bfseries\large}{\thesubsection:\ }{0pt}{}[]
-                          }
-\newcommand{\aqtitle}{\begin{titlepage}
-                     	\begin{center}
-                     		\includegraphics[scale = 0.75]{titlepage.png}\\[0.5cm]
+\newcommand{\aqchap}[1]{%
+	\titleformat{\chapter}[block]
+	            {\normalfont\bfseries\Huge}{#1\thechapter:\\}{0pt}{}[]
+}
 
-                     		\textsc{\Huge \aqademia@organization}\\
-                     		\rule{\linewidth}{0.2 mm}\\[0.3 cm]
-                      		{\huge\bfseries\aqademia@title\ifaqademia@showsubtitle\ --- \aqademia@subtitle\fi}\\
-                     		\rule{\linewidth}{0.2 mm}\\[1 cm]
+\newcommand{\aqsec}[1]{%
+	\titleformat{\section}[block]
+	            {\normalfont\bfseries\huge}{#1\thesection: }{0pt}{}[]
+}
 
-                     		\vfill
+\newcommand{\aqssec}[1]{%
+	\titleformat{\subsection}[block]
+	            {\normalfont\bfseries\Large}{#1\thesubsection: }{0pt}{}[]
+}
 
-                     		\Large{\textbf{\theauthor}}\\[0.1cm]
-                      		\large{\url{\aqademia@repository}}\\[0.5 cm]
-                     		{\large \thedate}\\[1.5 cm]
-                     	\end{center}
+\newcommand{\aqsssec}[1]{%
+	\titleformat{\subsubsection}[block]
+	            {\normalfont\bfseries\large}{#1\thesubsubsection: }{0pt}{}[]
+}
 
-                     	\ifaqademia@license
-                     		{\doclicenseThis}
-                     	\fi
-                     \end{titlepage}
+\newcommand{\aqapp}[1]{%
+	\setcounter{chapter}{0}
+	\renewcommand{\thesection}
+	             {\MakeUppercase{\alph{chapter}}.\arabic{section}}
+	\renewcommand{\thesubsection}
+					 {\MakeUppercase{\alph{chapter}}.\arabic{section}.\arabic{subsection}}
+	\renewcommand{\thesubsubsection}
+					 {\MakeUppercase{\alph{chapter}}.\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
+	\titleformat{\chapter}[block]
+					{\normalfont\bfseries\Huge}{#1\MakeUppercase{\alph{chapter}}:\\}{0pt}{}[]
+}
 
-                     \ifaqademia@toc
-                     	\tableofcontents
-                     \fi
-                    }
-\newcommand{\code}[1]{\begingroup\fontsize{9pt}{12pt}\selectfont\texttt{#1}\endgroup}
+\newcommand{\aqtitlepage}[4][]{%
+	\begin{titlepage}
+		\begin{center}
+			\includegraphics[scale = 0.75]{titlepage.png}\\[0.5cm]
+
+			\ifthenelse{\isempty{#2}}{}
+				{\textsc{\Huge{#2}}\\}
+
+			\ifthenelse{\isempty{#3}}
+				{\rule{\linewidth}{0.2 mm}\\[0.3 cm]}
+				{\rule{\linewidth}{0.2 mm}\\}
+			{\huge\bfseries\thetitle\ifthenelse{\isempty{#3}}{}{ --- #3\\}}
+			\rule{\linewidth}{0.2 mm}\\[1 cm]
+
+			\vfill
+
+			\Large{\textbf{\theauthor}}
+			\ifthenelse{\isempty{#4}}{}
+				{\\[0.1cm]\large{\url{#4}}}\\[0.5 cm]
+			\large{\thedate}\\[1.5 cm]
+		\end{center}
+
+		\ifthenelse{\equal{#1}{nolicense}}
+			{}
+			{\doclicenseThis}
+	\end{titlepage}
+}
+
+\newcommand{\code}[1]{%
+	\begingroup\fontsize{9pt}{12pt}\selectfont\texttt{#1}\endgroup
+}
