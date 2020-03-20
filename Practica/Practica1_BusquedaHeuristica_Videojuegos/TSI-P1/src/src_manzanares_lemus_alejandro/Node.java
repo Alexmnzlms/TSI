@@ -8,18 +8,18 @@ import tools.Vector2d;
 
 import java.util.ArrayList;
 
-public class Node{
+public class Node implements Comparable<Node>{
 
     private double distancia_objetivo;
     private double coste_camino;
     private double coste_total;
-    private Types.ACTIONS accion;
+    private ArrayList<Types.ACTIONS> accion;
     private Vector2d posicion;
+    private Vector2d orientacion;
     private Vector2d portal;
     private StateObservation stateObs;
 
-    public Node(StateObservation stateObs, Vector2d pos, Vector2d port, double coste, Types.ACTIONS accion)
-    {
+    public Node(StateObservation stateObs, Vector2d pos, Vector2d port, double coste, ArrayList<Types.ACTIONS> accion) {
         posicion = pos;
         portal = port;
         coste_camino = coste;
@@ -27,15 +27,7 @@ public class Node{
         coste_total = distancia_objetivo + coste_camino;
         this.accion = accion;
         this.stateObs = stateObs;
-        System.out.println("Pos_x:");
-        System.out.println(posicion.x);
-        System.out.println("Pos_y:");
-        System.out.println(posicion.y);
-
-        System.out.println("Coste camino:");
-        System.out.println(coste_camino);
-        System.out.println("Distancia objetivo:");
-        System.out.println(distancia_objetivo);
+        orientacion = stateObs.getAvatarOrientation();
     }
 
     public int compareTo(Node n) {
@@ -52,18 +44,36 @@ public class Node{
 
     public boolean equals(Node o)
     {
-        return this.posicion.equals(o.posicion) && this.accion != o.accion;
+        return this.posicion.equals(o.posicion) && this.accion == o.accion && orientacion == o.orientacion;
     }
 
     public double getCoste_total() {
         return coste_total;
     }
 
-    public Types.ACTIONS getAccion() {
+    public ArrayList<Types.ACTIONS> getAccion() {
         return accion;
     }
 
     public double getCoste_camino() {
         return coste_camino;
+    }
+
+    public Vector2d getPosicion(){
+        return posicion;
+    }
+
+    @Override
+    public String toString() {
+        return "Nodo{" +
+                "posicion.x=" + posicion.x +
+                ", posicion.y=" + posicion.y +
+                ", coste_camino=" + coste_camino +
+                ", distancia_objetivo=" + distancia_objetivo +
+                ", accion=" + accion +
+                ", orientacion.x=" + stateObs.getAvatarOrientation().x +
+                ", orientacion.y=" + stateObs.getAvatarOrientation().y +
+                ", grid=" + (stateObs.getObservationGrid()[(int) posicion.x][(int) posicion.y]).toString() +
+                "}\n";
     }
 }
