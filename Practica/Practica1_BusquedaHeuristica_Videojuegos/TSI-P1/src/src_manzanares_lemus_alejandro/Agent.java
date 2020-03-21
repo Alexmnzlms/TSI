@@ -15,7 +15,7 @@ import static java.util.Collections.*;
 public class Agent extends AbstractPlayer {
   Vector2d fescala;
   Vector2d portal;
-  int c = 0;
+  ArrayList<Types.ACTIONS> ruta;
 
   public Agent(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     fescala = new Vector2d(stateObs.getWorldDimension().width / stateObs.getObservationGrid().length ,
@@ -32,7 +32,7 @@ public class Agent extends AbstractPlayer {
     System.out.println(portal.x);
     System.out.print("Portal_y:");
     System.out.println(portal.y);
-    A_estrella(portal,stateObs,elapsedTimer);
+    ruta = new ArrayList<Types.ACTIONS>(A_estrella(portal,stateObs,elapsedTimer));
   }
 
   public void init(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
@@ -46,20 +46,24 @@ public class Agent extends AbstractPlayer {
     ArrayList<Observation>[][] obv = stateObs.getObservationGrid();
     ArrayList<Types.ACTIONS> acciones = stateObs.getAvailableActions();
     Vector2d pos_inicial = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
-    Vector2d new_pos;
     Node padre = new Node(stateObs, pos_inicial,destino,0,path);
     Node actual;
-    abiertos.add(padre);
-    System.out.println(abiertos.get(0));
     boolean fin= false;
+    int it = 0;
+
+    abiertos.add(padre);
+    System.out.println(padre.toString());
     stateObs.advance(Types.ACTIONS.ACTION_NIL);
-    while(!fin){
+
+    do{
       actual = abiertos.get(0);
+      cerrados.add(actual);
+      abiertos.remove(0);
+
       for(int i = 0; i < acciones.size(); i++){
         System.out.println(acciones.get(i));
+        Vector2d new_pos = new Vector2d(actual.getPosicion());
         if(acciones.get(i) != Types.ACTIONS.ACTION_USE) {
-          //Calcular aqui la nueva posicion en funcion de la accion
-          new_pos = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
           if(acciones.get(i) == Types.ACTIONS.ACTION_UP){
             new_pos.y = new_pos.y - 1;
           } else if(acciones.get(i) == Types.ACTIONS.ACTION_DOWN){
@@ -70,36 +74,42 @@ public class Agent extends AbstractPlayer {
             new_pos.x = new_pos.x - 1;
           }
 
+
           //ArrayList<Observation> obv = stateObs.getObservationGrid()[(int) new_pos.x][(int) new_pos.y];
           //System.out.println(obv.get(0).itype);
           int tipo = (obv[(int) new_pos.x][(int) new_pos.y]).get(0).itype;
           System.out.println(tipo);
           if(tipo == 2 || tipo == 5){
-            ArrayList<Types.ACTIONS> camino_actual = new ArrayList<Types.ACTIONS>();
-            Collections.copy(camino_actual,actual.getAccion());
+            ArrayList<Types.ACTIONS> camino_actual = new ArrayList<Types.ACTIONS>(actual.getAccion());
             camino_actual.add(acciones.get(i));
-            cerrados.add(new Node(stateObs, new_pos, destino, actual.getCoste_camino()+2.0,camino_actual));
-
+            System.out.println("Camino actual:");
+            for(int j = 0; j < camino_actual.size(); j++){
+              System.out.println(camino_actual.get(j));
+            }
+            System.out.println();
+            abiertos.add(new Node(stateObs, new_pos, destino, actual.getCoste_camino()+1.0,camino_actual));
           }
         }
       }
-      sort(cerrados);
-      for(int i = 0; i < cerrados.size(); i++) {
-        System.out.println(cerrados.get(i).toString());
-      }
-      fin = true;
-    }
+      sort(abiertos);
+      //for(int i = 0; i < abiertos.size(); i++) {
+      //  System.out.println(abiertos.get(i).toString());
+      //}
+    }while(actual.getTipo() != 5);
+
+    System.out.println(actual.toString());
+
+    path = new ArrayList<Types.ACTIONS>(actual.getAccion());
+
     return path;
   }
 
   public Types.ACTIONS act( StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
-    if (c == 0) {
-      c++;
-      return Types.ACTIONS.ACTION_DOWN;
-    } else {
-      c++;
-      return Types.ACTIONS.ACTION_NIL;
-    }
+    Types.ACTIONS accion = ruta.get(0);
+    System.out.println(ruta);
+    ruta.remove(0);
+    return accion;
+
 
 
     /*Vector2d avatar =  new Vector2d(stateObs.getAvatarPosition().x / fescala.x,

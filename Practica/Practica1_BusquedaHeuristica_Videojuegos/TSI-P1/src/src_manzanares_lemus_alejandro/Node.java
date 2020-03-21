@@ -7,27 +7,32 @@ import tools.Direction;
 import tools.Vector2d;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Node implements Comparable<Node>{
 
     private double distancia_objetivo;
     private double coste_camino;
     private double coste_total;
-    private ArrayList<Types.ACTIONS> accion;
+    private ArrayList<Types.ACTIONS> accion = new ArrayList<Types.ACTIONS>();
     private Vector2d posicion;
     private Vector2d orientacion;
     private Vector2d portal;
+    private int tipo;
     private StateObservation stateObs;
 
-    public Node(StateObservation stateObs, Vector2d pos, Vector2d port, double coste, ArrayList<Types.ACTIONS> accion) {
+    public Node(StateObservation stateObs, Vector2d pos, Vector2d port, double coste, ArrayList<Types.ACTIONS> acc) {
         posicion = pos;
         portal = port;
         coste_camino = coste;
         distancia_objetivo = calcular_heuristica();
         coste_total = distancia_objetivo + coste_camino;
-        this.accion = accion;
+        for(int i = 0; i < acc.size(); i++){
+            accion.add(acc.get(i));
+        }
         this.stateObs = stateObs;
         orientacion = stateObs.getAvatarOrientation();
+        tipo = (stateObs.getObservationGrid()[(int) posicion.x][(int) posicion.y]).get(0).itype;
     }
 
     public int compareTo(Node n) {
@@ -63,17 +68,29 @@ public class Node implements Comparable<Node>{
         return posicion;
     }
 
+    public int getTipo(){
+        return tipo;
+    }
+
+    public Types.ACTIONS getLast_action(){
+        if(accion.size() > 0){
+            return accion.get(accion.size()-1);
+        }
+
+    }
+
     @Override
     public String toString() {
         return "Nodo{" +
                 "posicion.x=" + posicion.x +
                 ", posicion.y=" + posicion.y +
+                ", coste_total=" + coste_total +
                 ", coste_camino=" + coste_camino +
                 ", distancia_objetivo=" + distancia_objetivo +
                 ", accion=" + accion +
                 ", orientacion.x=" + stateObs.getAvatarOrientation().x +
                 ", orientacion.y=" + stateObs.getAvatarOrientation().y +
-                ", grid=" + (stateObs.getObservationGrid()[(int) posicion.x][(int) posicion.y]).toString() +
+                ", tipo=" + tipo +
                 "}\n";
     }
 }
