@@ -81,40 +81,35 @@ public class Agent extends AbstractPlayer {
         System.out.println(acciones.get(i));
         Vector2d new_pos = new Vector2d(actual.getPosicion());
         Vector2d new_ori = new Vector2d(actual.getOrientacion());
-        switch (acciones.get(i)) {
-          case ACTIONS.ACTION_RIGHT:
-            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_RIGHT)) {
-              new_pos.x = new_pos.x + 1;
-            } else {
-              new_ori.x = 1.0;
-              new_ori.y = 0.0;
-            }
-            break;
-          case ACTIONS.ACTION_LEFT:
-            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_LEFT)) {
-              new_pos.x = new_pos.x - 1;
-            } else {
-              new_ori.x = -1.0;
-              new_ori.y = 0.0;
-            }
-            break;
-          case ACTIONS.ACTION_UP:
-            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_UP)) {
-              new_pos.y = new_pos.y - 1;
-            } else {
-              new_ori.x = 0.0;
-              new_ori.y = -1.0;
-            }
-            break;
-          case ACTIONS.ACTION_DOWN:
-            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_DOWN)) {
-              new_pos.y = new_pos.y + 1;
-            } else {
-              new_ori.x = 0.0;
-              new_ori.y = 1.0;
-            }
-            break;
+        if (acciones.get(i) == ACTIONS.ACTION_RIGHT) {
+          if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_RIGHT)) {
+            new_pos.x = new_pos.x + 1;
+          } else {
+            new_ori.x = 1.0;
+            new_ori.y = 0.0;
           }
+        } else if (acciones.get(i) == ACTIONS.ACTION_LEFT) {
+          if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_LEFT)) {
+            new_pos.x = new_pos.x - 1;
+          } else {
+            new_ori.x = -1.0;
+            new_ori.y = 0.0;
+          }
+        } else if (acciones.get(i) == ACTIONS.ACTION_UP) {
+          if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_UP)) {
+            new_pos.y = new_pos.y - 1;
+          } else {
+            new_ori.x = 0.0;
+            new_ori.y = -1.0;
+          }
+        } else if (acciones.get(i) == ACTIONS.ACTION_DOWN) {
+          if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_DOWN)) {
+            new_pos.y = new_pos.y + 1;
+          } else {
+            new_ori.x = 0.0;
+            new_ori.y = 1.0;
+          }
+        }
 
         //ArrayList<Observation> obv = stateObs.getObservationGrid()[(int) new_pos.x][(int) new_pos.y];
         //System.out.println(obv.get(0).itype);

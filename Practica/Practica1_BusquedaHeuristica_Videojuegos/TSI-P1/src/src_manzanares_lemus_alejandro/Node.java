@@ -21,7 +21,7 @@ public class Node implements Comparable<Node>{
     private int tipo;
     private StateObservation stateObs;
 
-    public Node(StateObservation stateObs, Vector2d pos, Vector2d port, double coste, ArrayList<Types.ACTIONS> acc) {
+    public Node(StateObservation stateObs,Vector2d ori ,Vector2d pos, Vector2d port, double coste, ArrayList<Types.ACTIONS> acc){
         posicion = pos;
         portal = port;
         coste_camino = coste;
@@ -31,7 +31,7 @@ public class Node implements Comparable<Node>{
             accion.add(acc.get(i));
         }
         this.stateObs = stateObs;
-        orientacion = stateObs.getAvatarOrientation();
+        orientacion = ori;
         tipo = (stateObs.getObservationGrid()[(int) posicion.x][(int) posicion.y]).get(0).itype;
     }
 
@@ -72,11 +72,8 @@ public class Node implements Comparable<Node>{
         return tipo;
     }
 
-    public Types.ACTIONS getLast_action(){
-        if(accion.size() > 0){
-            return accion.get(accion.size()-1);
-        }
-
+    public Vector2d getOrientacion(){
+        return orientacion;
     }
 
     @Override
@@ -88,8 +85,8 @@ public class Node implements Comparable<Node>{
                 ", coste_camino=" + coste_camino +
                 ", distancia_objetivo=" + distancia_objetivo +
                 ", accion=" + accion +
-                ", orientacion.x=" + stateObs.getAvatarOrientation().x +
-                ", orientacion.y=" + stateObs.getAvatarOrientation().y +
+                ", orientacion.x=" + orientacion.x +
+                ", orientacion.y=" + orientacion.y +
                 ", tipo=" + tipo +
                 "}\n";
     }
