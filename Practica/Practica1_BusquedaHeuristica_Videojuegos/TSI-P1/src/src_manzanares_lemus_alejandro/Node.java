@@ -21,10 +21,10 @@ public class Node implements Comparable<Node>{
     private int tipo;
     private StateObservation stateObs;
 
-    public Node(StateObservation stateObs,Vector2d ori ,Vector2d pos, Vector2d port, double coste, ArrayList<Types.ACTIONS> acc){
+    public Node(StateObservation stateObs,Vector2d ori ,Vector2d pos, Vector2d port, ArrayList<Types.ACTIONS> acc){
         posicion = pos;
         portal = port;
-        coste_camino = coste;
+        coste_camino = acc.size();
         distancia_objetivo = calcular_heuristica();
         coste_total = distancia_objetivo + coste_camino;
         for(int i = 0; i < acc.size(); i++){
@@ -40,6 +40,14 @@ public class Node implements Comparable<Node>{
             return -1;
         if(this.coste_total > n.coste_total)
             return 1;
+        if(this.coste_total == n.coste_total){
+            if(this.distancia_objetivo < n.distancia_objetivo){
+                return -1;
+            }
+            if(this.distancia_objetivo > n.distancia_objetivo){
+                return 1;
+            }
+        }
         return 0;
     }
 
@@ -49,7 +57,7 @@ public class Node implements Comparable<Node>{
 
     public boolean equals(Node o)
     {
-        return this.posicion.equals(o.posicion) && this.accion == o.accion && orientacion == o.orientacion;
+        return this.posicion.equals(o.posicion) && this.orientacion.equals(o.orientacion);/*&& this.accion == o.accion*/
     }
 
     public double getCoste_total() {
@@ -81,12 +89,12 @@ public class Node implements Comparable<Node>{
         return "Nodo{" +
                 "posicion.x=" + posicion.x +
                 ", posicion.y=" + posicion.y +
+                ", orientacion.x=" + orientacion.x +
+                ", orientacion.y=" + orientacion.y +
                 ", coste_total=" + coste_total +
                 ", coste_camino=" + coste_camino +
                 ", distancia_objetivo=" + distancia_objetivo +
                 ", accion=" + accion +
-                ", orientacion.x=" + orientacion.x +
-                ", orientacion.y=" + orientacion.y +
                 ", tipo=" + tipo +
                 "}\n";
     }

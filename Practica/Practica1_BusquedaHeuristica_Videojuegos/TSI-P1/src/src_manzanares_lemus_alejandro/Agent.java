@@ -30,10 +30,17 @@ public class Agent extends AbstractPlayer {
     portal.x = Math.floor(portal.x / fescala.x);
     portal.y = Math.floor(portal.y / fescala.y);
 
-    System.out.print("Portal_x:");
-    System.out.println(portal.x);
-    System.out.print("Portal_y:");
-    System.out.println(portal.y);
+    System.out.print("Mundo: ");
+    System.out.print(stateObs.getObservationGrid().length);
+    System.out.print(" x ");
+    System.out.println(stateObs.getObservationGrid()[0].length);
+    System.out.print("Portal: (");
+    System.out.print(portal.x);
+    System.out.print(", ");
+    System.out.print(portal.y);
+    System.out.println(")");
+
+
     ruta = new ArrayList<ACTIONS>(A_estrella(portal,stateObs,elapsedTimer));
   }
 
@@ -63,13 +70,14 @@ public class Agent extends AbstractPlayer {
     ArrayList<ACTIONS> acciones = stateObs.getAvailableActions();
     Vector2d pos_inicial = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
     Vector2d ori_inicial = new Vector2d(stateObs.getAvatarOrientation());
-    Node padre = new Node(stateObs, ori_inicial,pos_inicial,destino,0,path);
+    Node padre = new Node(stateObs, ori_inicial,pos_inicial,destino,path);
     Node actual;
     boolean fin= false;
+    boolean encontrado = false;
     int it = 0;
 
     abiertos.add(padre);
-    System.out.println(padre.toString());
+    //System.out.println(padre.toString());
     stateObs.advance(ACTIONS.ACTION_NIL);
 
     do{
@@ -78,61 +86,64 @@ public class Agent extends AbstractPlayer {
       abiertos.remove(0);
 
       for(int i = 0; i < acciones.size(); i++){
-        System.out.println(acciones.get(i));
+        //System.out.println(acciones.get(i));
         Vector2d new_pos = new Vector2d(actual.getPosicion());
         Vector2d new_ori = new Vector2d(actual.getOrientacion());
-        if (acciones.get(i) == ACTIONS.ACTION_RIGHT) {
-          if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_RIGHT)) {
-            new_pos.x = new_pos.x + 1;
-          } else {
-            new_ori.x = 1.0;
-            new_ori.y = 0.0;
+        if (acciones.get(i) != ACTIONS.ACTION_USE){
+          if (acciones.get(i) == ACTIONS.ACTION_RIGHT) {
+            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_RIGHT)) {
+              new_pos.x = new_pos.x + 1;
+            } else {
+              new_ori.x = 1.0;
+              new_ori.y = 0.0;
+            }
+          } else if (acciones.get(i) == ACTIONS.ACTION_LEFT) {
+            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_LEFT)) {
+              new_pos.x = new_pos.x - 1;
+            } else {
+              new_ori.x = -1.0;
+              new_ori.y = 0.0;
+            }
+          } else if (acciones.get(i) == ACTIONS.ACTION_UP) {
+            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_UP)) {
+              new_pos.y = new_pos.y - 1;
+            } else {
+              new_ori.x = 0.0;
+              new_ori.y = -1.0;
+            }
+          } else if (acciones.get(i) == ACTIONS.ACTION_DOWN) {
+            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_DOWN)) {
+              new_pos.y = new_pos.y + 1;
+            } else {
+              new_ori.x = 0.0;
+              new_ori.y = 1.0;
+            }
           }
-        } else if (acciones.get(i) == ACTIONS.ACTION_LEFT) {
-          if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_LEFT)) {
-            new_pos.x = new_pos.x - 1;
-          } else {
-            new_ori.x = -1.0;
-            new_ori.y = 0.0;
+          int tipo = (obv[(int) new_pos.x][(int) new_pos.y]).get(0).itype;
+          if(tipo != 0) {
+            ArrayList<ACTIONS> camino_actual = new ArrayList<ACTIONS>(actual.getAccion());
+            camino_actual.add(acciones.get(i));
+            Node hijo = new Node(stateObs, new_ori, new_pos, destino, camino_actual);
+            encontrado = false;
+            for(int j = 0; j < abiertos.size() && !encontrado && abiertos.size() >= 1; j++){
+              if(hijo.equals(abiertos.get(j))){
+                encontrado = true;
+              }
+            }
+            if(!encontrado){
+              abiertos.add(hijo);
+            }
           }
-        } else if (acciones.get(i) == ACTIONS.ACTION_UP) {
-          if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_UP)) {
-            new_pos.y = new_pos.y - 1;
-          } else {
-            new_ori.x = 0.0;
-            new_ori.y = -1.0;
-          }
-        } else if (acciones.get(i) == ACTIONS.ACTION_DOWN) {
-          if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_DOWN)) {
-            new_pos.y = new_pos.y + 1;
-          } else {
-            new_ori.x = 0.0;
-            new_ori.y = 1.0;
-          }
-        }
-
-        //ArrayList<Observation> obv = stateObs.getObservationGrid()[(int) new_pos.x][(int) new_pos.y];
-        //System.out.println(obv.get(0).itype);
-        int tipo = (obv[(int) new_pos.x][(int) new_pos.y]).get(0).itype;
-        System.out.println(tipo);
-        if(tipo == 2 || tipo == 5) {
-          ArrayList<ACTIONS> camino_actual = new ArrayList<ACTIONS>(actual.getAccion());
-          camino_actual.add(acciones.get(i));
-          System.out.println("Camino actual:");
-          for (int j = 0; j < camino_actual.size(); j++) {
-            System.out.println(camino_actual.get(j));
-          }
-          System.out.println();
-          abiertos.add(new Node(stateObs, new_ori, new_pos, destino, actual.getCoste_camino() + 1.0, camino_actual));
         }
       }
       sort(abiertos);
       //for(int i = 0; i < abiertos.size(); i++) {
       //  System.out.println(abiertos.get(i).toString());
       //}
+      //System.out.println(actual.toString());
     }while(actual.getTipo() != 5);
 
-    System.out.println(actual.toString());
+    //System.out.println(actual.toString());
 
     path = new ArrayList<ACTIONS>(actual.getAccion());
 
