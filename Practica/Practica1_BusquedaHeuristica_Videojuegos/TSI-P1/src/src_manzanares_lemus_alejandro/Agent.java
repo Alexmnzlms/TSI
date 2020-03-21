@@ -9,13 +9,15 @@ import tools.Vector2d;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Vector;
 
 import static java.util.Collections.*;
+import static ontology.Types.*;
 
 public class Agent extends AbstractPlayer {
   Vector2d fescala;
   Vector2d portal;
-  ArrayList<Types.ACTIONS> ruta;
+  ArrayList<ACTIONS> ruta;
 
   public Agent(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     fescala = new Vector2d(stateObs.getWorldDimension().width / stateObs.getObservationGrid().length ,
@@ -32,28 +34,43 @@ public class Agent extends AbstractPlayer {
     System.out.println(portal.x);
     System.out.print("Portal_y:");
     System.out.println(portal.y);
-    ruta = new ArrayList<Types.ACTIONS>(A_estrella(portal,stateObs,elapsedTimer));
+    ruta = new ArrayList<ACTIONS>(A_estrella(portal,stateObs,elapsedTimer));
   }
 
   public void init(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
 
   }
 
-  public ArrayList<Types.ACTIONS> A_estrella (Vector2d destino, StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
+  public boolean misma_orientacion_accion(Vector2d orientacion, ACTIONS accion){
+    if(accion == ACTIONS.ACTION_RIGHT && orientacion.x == 1.0){
+      return true;
+    } else if (accion == ACTIONS.ACTION_LEFT && orientacion.x == -1.0){
+      return true;
+    } else if (accion == ACTIONS.ACTION_UP && orientacion.y == -1.0){
+      return true;
+    } else if (accion == ACTIONS.ACTION_DOWN && orientacion.y == 1.0){
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public ArrayList<ACTIONS> A_estrella (Vector2d destino, StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     ArrayList<Node> abiertos = new ArrayList<Node>();
     ArrayList<Node> cerrados = new ArrayList<Node>();
-    ArrayList<Types.ACTIONS> path = new ArrayList<Types.ACTIONS>();
+    ArrayList<ACTIONS> path = new ArrayList<ACTIONS>();
     ArrayList<Observation>[][] obv = stateObs.getObservationGrid();
-    ArrayList<Types.ACTIONS> acciones = stateObs.getAvailableActions();
+    ArrayList<ACTIONS> acciones = stateObs.getAvailableActions();
     Vector2d pos_inicial = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
-    Node padre = new Node(stateObs, pos_inicial,destino,0,path);
+    Vector2d ori_inicial = new Vector2d(stateObs.getAvatarOrientation());
+    Node padre = new Node(stateObs, ori_inicial,pos_inicial,destino,0,path);
     Node actual;
     boolean fin= false;
     int it = 0;
 
     abiertos.add(padre);
     System.out.println(padre.toString());
-    stateObs.advance(Types.ACTIONS.ACTION_NIL);
+    stateObs.advance(ACTIONS.ACTION_NIL);
 
     do{
       actual = abiertos.get(0);
@@ -63,32 +80,55 @@ public class Agent extends AbstractPlayer {
       for(int i = 0; i < acciones.size(); i++){
         System.out.println(acciones.get(i));
         Vector2d new_pos = new Vector2d(actual.getPosicion());
-        if(acciones.get(i) != Types.ACTIONS.ACTION_USE) {
-          if(acciones.get(i) == Types.ACTIONS.ACTION_UP){
-            new_pos.y = new_pos.y - 1;
-          } else if(acciones.get(i) == Types.ACTIONS.ACTION_DOWN){
-            new_pos.y = new_pos.y + 1;
-          } else if(acciones.get(i) == Types.ACTIONS.ACTION_RIGHT){
-            new_pos.x = new_pos.x + 1;
-          } else if(acciones.get(i) == Types.ACTIONS.ACTION_LEFT) {
-            new_pos.x = new_pos.x - 1;
-          }
-
-
-          //ArrayList<Observation> obv = stateObs.getObservationGrid()[(int) new_pos.x][(int) new_pos.y];
-          //System.out.println(obv.get(0).itype);
-          int tipo = (obv[(int) new_pos.x][(int) new_pos.y]).get(0).itype;
-          System.out.println(tipo);
-          if(tipo == 2 || tipo == 5){
-            ArrayList<Types.ACTIONS> camino_actual = new ArrayList<Types.ACTIONS>(actual.getAccion());
-            camino_actual.add(acciones.get(i));
-            System.out.println("Camino actual:");
-            for(int j = 0; j < camino_actual.size(); j++){
-              System.out.println(camino_actual.get(j));
+        Vector2d new_ori = new Vector2d(actual.getOrientacion());
+        switch (acciones.get(i)) {
+          case ACTIONS.ACTION_RIGHT:
+            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_RIGHT)) {
+              new_pos.x = new_pos.x + 1;
+            } else {
+              new_ori.x = 1.0;
+              new_ori.y = 0.0;
             }
-            System.out.println();
-            abiertos.add(new Node(stateObs, new_pos, destino, actual.getCoste_camino()+1.0,camino_actual));
+            break;
+          case ACTIONS.ACTION_LEFT:
+            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_LEFT)) {
+              new_pos.x = new_pos.x - 1;
+            } else {
+              new_ori.x = -1.0;
+              new_ori.y = 0.0;
+            }
+            break;
+          case ACTIONS.ACTION_UP:
+            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_UP)) {
+              new_pos.y = new_pos.y - 1;
+            } else {
+              new_ori.x = 0.0;
+              new_ori.y = -1.0;
+            }
+            break;
+          case ACTIONS.ACTION_DOWN:
+            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_DOWN)) {
+              new_pos.y = new_pos.y + 1;
+            } else {
+              new_ori.x = 0.0;
+              new_ori.y = 1.0;
+            }
+            break;
           }
+
+        //ArrayList<Observation> obv = stateObs.getObservationGrid()[(int) new_pos.x][(int) new_pos.y];
+        //System.out.println(obv.get(0).itype);
+        int tipo = (obv[(int) new_pos.x][(int) new_pos.y]).get(0).itype;
+        System.out.println(tipo);
+        if(tipo == 2 || tipo == 5) {
+          ArrayList<ACTIONS> camino_actual = new ArrayList<ACTIONS>(actual.getAccion());
+          camino_actual.add(acciones.get(i));
+          System.out.println("Camino actual:");
+          for (int j = 0; j < camino_actual.size(); j++) {
+            System.out.println(camino_actual.get(j));
+          }
+          System.out.println();
+          abiertos.add(new Node(stateObs, new_ori, new_pos, destino, actual.getCoste_camino() + 1.0, camino_actual));
         }
       }
       sort(abiertos);
@@ -99,13 +139,13 @@ public class Agent extends AbstractPlayer {
 
     System.out.println(actual.toString());
 
-    path = new ArrayList<Types.ACTIONS>(actual.getAccion());
+    path = new ArrayList<ACTIONS>(actual.getAccion());
 
     return path;
   }
 
-  public Types.ACTIONS act( StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
-    Types.ACTIONS accion = ruta.get(0);
+  public ACTIONS act( StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
+    ACTIONS accion = ruta.get(0);
     System.out.println(ruta);
     ruta.remove(0);
     return accion;
