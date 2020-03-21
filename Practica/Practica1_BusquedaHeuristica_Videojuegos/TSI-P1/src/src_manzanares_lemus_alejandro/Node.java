@@ -42,7 +42,7 @@ public class Node implements Comparable<Node>{
             return 1;
         if(this.coste_total == n.coste_total){
             if(this.distancia_objetivo < n.distancia_objetivo){
-                return -1;
+                return  -1;
             }
             if(this.distancia_objetivo > n.distancia_objetivo){
                 return 1;

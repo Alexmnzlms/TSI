@@ -7,9 +7,7 @@ import ontology.Types;
 import tools.ElapsedCpuTimer;
 import tools.Vector2d;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Vector;
+import java.util.*;
 
 import static java.util.Collections.*;
 import static ontology.Types.*;
@@ -18,6 +16,7 @@ public class Agent extends AbstractPlayer {
   Vector2d fescala;
   Vector2d portal;
   ArrayList<ACTIONS> ruta;
+  boolean ruta_completa;
 
   public Agent(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     fescala = new Vector2d(stateObs.getWorldDimension().width / stateObs.getObservationGrid().length ,
@@ -34,13 +33,6 @@ public class Agent extends AbstractPlayer {
     System.out.print(stateObs.getObservationGrid().length);
     System.out.print(" x ");
     System.out.println(stateObs.getObservationGrid()[0].length);
-    System.out.print("Portal: (");
-    System.out.print(portal.x);
-    System.out.print(", ");
-    System.out.print(portal.y);
-    System.out.println(")");
-
-
     ruta = new ArrayList<ACTIONS>(A_estrella(portal,stateObs,elapsedTimer));
   }
 
@@ -74,12 +66,16 @@ public class Agent extends AbstractPlayer {
     Node actual;
     boolean fin= false;
     boolean encontrado = false;
-    int it = 0;
 
     abiertos.add(padre);
     //System.out.println(padre.toString());
     stateObs.advance(ACTIONS.ACTION_NIL);
 
+    System.out.print("Portal: (");
+    System.out.print(destino.x);
+    System.out.print(", ");
+    System.out.print(destino.y);
+    System.out.println(")");
     do{
       actual = abiertos.get(0);
       cerrados.add(actual);
@@ -89,40 +85,37 @@ public class Agent extends AbstractPlayer {
         //System.out.println(acciones.get(i));
         Vector2d new_pos = new Vector2d(actual.getPosicion());
         Vector2d new_ori = new Vector2d(actual.getOrientacion());
+        Types.ACTIONS elegida;
         if (acciones.get(i) != ACTIONS.ACTION_USE){
           if (acciones.get(i) == ACTIONS.ACTION_RIGHT) {
-            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_RIGHT)) {
-              new_pos.x = new_pos.x + 1;
-            } else {
-              new_ori.x = 1.0;
-              new_ori.y = 0.0;
-            }
+            new_pos.x = new_pos.x + 1;
           } else if (acciones.get(i) == ACTIONS.ACTION_LEFT) {
-            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_LEFT)) {
-              new_pos.x = new_pos.x - 1;
-            } else {
-              new_ori.x = -1.0;
-              new_ori.y = 0.0;
-            }
+            new_pos.x = new_pos.x - 1;
           } else if (acciones.get(i) == ACTIONS.ACTION_UP) {
-            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_UP)) {
-              new_pos.y = new_pos.y - 1;
-            } else {
-              new_ori.x = 0.0;
-              new_ori.y = -1.0;
-            }
+            new_pos.y = new_pos.y - 1;
           } else if (acciones.get(i) == ACTIONS.ACTION_DOWN) {
-            if (misma_orientacion_accion(new_ori, ACTIONS.ACTION_DOWN)) {
-              new_pos.y = new_pos.y + 1;
-            } else {
-              new_ori.x = 0.0;
-              new_ori.y = 1.0;
-            }
+            new_pos.y = new_pos.y + 1;
           }
           int tipo = (obv[(int) new_pos.x][(int) new_pos.y]).get(0).itype;
           if(tipo != 0) {
             ArrayList<ACTIONS> camino_actual = new ArrayList<ACTIONS>(actual.getAccion());
             camino_actual.add(acciones.get(i));
+            if(!misma_orientacion_accion(new_ori,acciones.get(i))){
+              camino_actual.add(acciones.get(i));
+            }
+            if (acciones.get(i) == ACTIONS.ACTION_RIGHT) {
+              new_ori.x = 1;
+              new_ori.y = 0;
+            } else if (acciones.get(i) == ACTIONS.ACTION_LEFT) {
+              new_ori.x = -1;
+              new_ori.y = 0;
+            } else if (acciones.get(i) == ACTIONS.ACTION_UP) {
+              new_ori.x = 0;
+              new_ori.y = -1;
+            } else if (acciones.get(i) == ACTIONS.ACTION_DOWN) {
+              new_ori.x = 0;
+              new_ori.y = 1;
+            }
             Node hijo = new Node(stateObs, new_ori, new_pos, destino, camino_actual);
             encontrado = false;
             for(int j = 0; j < abiertos.size() && !encontrado && abiertos.size() >= 1; j++){
@@ -141,7 +134,10 @@ public class Agent extends AbstractPlayer {
       //  System.out.println(abiertos.get(i).toString());
       //}
       //System.out.println(actual.toString());
-    }while(actual.getTipo() != 5);
+      if(actual.getTipo() == 5){
+        ruta_completa = true;
+      }
+    }while(actual.getTipo() != 5 && elapsedTimer.remainingTimeMillis() > 0);
 
     //System.out.println(actual.toString());
 
@@ -151,52 +147,12 @@ public class Agent extends AbstractPlayer {
   }
 
   public ACTIONS act( StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
+    if(!ruta_completa && ruta.size() == 0){
+      ruta = new ArrayList<Types.ACTIONS>(A_estrella(portal,stateObs,elapsedTimer));
+    }
     ACTIONS accion = ruta.get(0);
-    System.out.println(ruta);
+    System.out.println(ruta.get(0));
     ruta.remove(0);
     return accion;
-
-
-
-    /*Vector2d avatar =  new Vector2d(stateObs.getAvatarPosition().x / fescala.x,
-            stateObs.getAvatarPosition().y / fescala.y);
-
-    //Probamos las cuatro acciones y calculamos la distancia del nuevo estado al portal.
-    Vector2d newPos_up = avatar, newPos_down = avatar, newPos_left = avatar, newPos_right = avatar;
-    if (avatar.y - 1 >= 0) {
-      newPos_up = new Vector2d(avatar.x, avatar.y-1);
-    }
-    if (avatar.y + 1 <= stateObs.getObservationGrid()[0].length-1) {
-      newPos_down = new Vector2d(avatar.x, avatar.y+1);
-    }
-    if (avatar.x - 1 >= 0) {
-      newPos_left = new Vector2d(avatar.x - 1, avatar.y);
-    }
-    if (avatar.x + 1 <= stateObs.getObservationGrid().length - 1) {
-      newPos_right = new Vector2d(avatar.x + 1, avatar.y);
-    }
-
-    //Manhattan distance
-    ArrayList<Integer> distances = new ArrayList<Integer>();
-    distances.add((int) (Math.abs(newPos_up.x - portal.x) + Math.abs(newPos_up.y-portal.y)));
-    distances.add((int) (Math.abs(newPos_down.x - portal.x) + Math.abs(newPos_down.y-portal.y)));
-    distances.add((int) (Math.abs(newPos_left.x - portal.x) + Math.abs(newPos_left.y-portal.y)));
-    distances.add((int) (Math.abs(newPos_right.x - portal.x) + Math.abs(newPos_right.y-portal.y)));
-
-    // Nos quedamos con el menor y tomamos esa accion.
-    int minIndex = distances.indexOf(Collections.min(distances));
-    switch (minIndex) {
-      case 0:
-        return Types.ACTIONS.ACTION_UP;
-      case 1:
-        return Types.ACTIONS.ACTION_DOWN;
-      case 2:
-        return Types.ACTIONS.ACTION_LEFT;
-      case 3:
-        return Types.ACTIONS.ACTION_RIGHT;
-      default:
-        return Types.ACTIONS.ACTION_NIL;
-    }*/
-
   }
 }
