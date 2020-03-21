@@ -57,7 +57,13 @@ public class Node implements Comparable<Node>{
 
     public boolean equals(Node o)
     {
-        return this.posicion.equals(o.posicion);/*&& this.accion == o.accion*/
+        return this.posicion.equals(o.posicion) && this.orientacion.equals(o.orientacion);/*&& this.accion == o.accion*/
+    }
+
+    public void update(Node o){
+        this.accion = o.accion;
+        this.coste_camino = o.coste_camino;
+        this.coste_total = o.coste_total;
     }
 
     public double getCoste_total() {
