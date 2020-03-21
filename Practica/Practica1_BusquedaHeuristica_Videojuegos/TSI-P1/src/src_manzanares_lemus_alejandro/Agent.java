@@ -15,8 +15,7 @@ import static ontology.Types.*;
 public class Agent extends AbstractPlayer {
   Vector2d fescala;
   Vector2d portal;
-  ArrayList<ACTIONS> ruta;
-  boolean ruta_completa;
+  ArrayList<ACTIONS> ruta = new ArrayList<ACTIONS>();
 
   public Agent(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     fescala = new Vector2d(stateObs.getWorldDimension().width / stateObs.getObservationGrid().length ,
@@ -33,7 +32,6 @@ public class Agent extends AbstractPlayer {
     System.out.print(stateObs.getObservationGrid().length);
     System.out.print(" x ");
     System.out.println(stateObs.getObservationGrid()[0].length);
-    ruta = new ArrayList<ACTIONS>(A_estrella(portal,stateObs,elapsedTimer));
   }
 
   public void init(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
@@ -118,8 +116,8 @@ public class Agent extends AbstractPlayer {
             }
             Node hijo = new Node(stateObs, new_ori, new_pos, destino, camino_actual);
             encontrado = false;
-            for(int j = 0; j < abiertos.size() && !encontrado && abiertos.size() >= 1; j++){
-              if(hijo.equals(abiertos.get(j))){
+            for(int j = 0; j < cerrados.size() && !encontrado; j++){
+              if(hijo.equals(cerrados.get(j))){
                 encontrado = true;
               }
             }
@@ -130,28 +128,23 @@ public class Agent extends AbstractPlayer {
         }
       }
       sort(abiertos);
-      //for(int i = 0; i < abiertos.size(); i++) {
-      //  System.out.println(abiertos.get(i).toString());
-      //}
-      //System.out.println(actual.toString());
-      if(actual.getTipo() == 5){
-        ruta_completa = true;
-      }
     }while(actual.getTipo() != 5 && elapsedTimer.remainingTimeMillis() > 0);
 
     //System.out.println(actual.toString());
 
     path = new ArrayList<ACTIONS>(actual.getAccion());
+    System.out.println(elapsedTimer.elapsedMillis());
+    System.out.println(elapsedTimer.remainingTimeMillis());
 
     return path;
   }
 
   public ACTIONS act( StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
-    if(!ruta_completa && ruta.size() == 0){
-      ruta = new ArrayList<Types.ACTIONS>(A_estrella(portal,stateObs,elapsedTimer));
+    if(ruta.size() == 0){
+      ruta = new ArrayList<ACTIONS>(A_estrella(portal,stateObs,elapsedTimer));
     }
     ACTIONS accion = ruta.get(0);
-    System.out.println(ruta.get(0));
+    //System.out.println(ruta.get(0));
     ruta.remove(0);
     return accion;
   }
