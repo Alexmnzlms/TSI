@@ -157,7 +157,7 @@ public class Agent extends AbstractPlayer {
       }
       sort(abiertos);
 
-    }while(actual.getTipo() != 5 && elapsedTimer.remainingTimeMillis() > 5);
+    }while(actual.getTipo() != 5 && elapsedTimer.remainingTimeMillis() > 10);
 
     tiempo += elapsedTimer.elapsedMillis();
 
