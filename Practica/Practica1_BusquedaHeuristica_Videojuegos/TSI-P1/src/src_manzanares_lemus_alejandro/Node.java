@@ -1,13 +1,11 @@
 package src_manzanares_lemus_alejandro;
 
-import core.game.Observation;
 import core.game.StateObservation;
 import ontology.Types;
-import tools.Direction;
 import tools.Vector2d;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Iterator;
 
 public class Node implements Comparable<Node>{
 
@@ -19,20 +17,16 @@ public class Node implements Comparable<Node>{
     private Vector2d orientacion;
     private Vector2d portal;
     private int tipo;
-    private StateObservation stateObs;
 
-    public Node(StateObservation stateObs,Vector2d ori ,Vector2d pos, Vector2d port, ArrayList<Types.ACTIONS> acc){
+    public Node(int tipo,Vector2d ori ,Vector2d pos, Vector2d port, ArrayList<Types.ACTIONS> acc){
         posicion = pos;
         portal = port;
         coste_camino = acc.size();
         distancia_objetivo = calcular_heuristica();
         coste_total = distancia_objetivo + coste_camino;
-        for(int i = 0; i < acc.size(); i++){
-            accion.add(acc.get(i));
-        }
-        this.stateObs = stateObs;
+        accion = new ArrayList<Types.ACTIONS>(acc);
         orientacion = ori;
-        tipo = (stateObs.getObservationGrid()[(int) posicion.x][(int) posicion.y]).get(0).itype;
+        this.tipo = tipo;
     }
 
     public int compareTo(Node n) {
@@ -57,13 +51,14 @@ public class Node implements Comparable<Node>{
 
     public boolean equals(Node o)
     {
-        return this.posicion.equals(o.posicion) && this.orientacion.equals(o.orientacion);/*&& this.accion == o.accion*/
+        return this.posicion.equals(o.posicion) /*&& this.orientacion.equals(o.orientacion)*/;/*&& this.accion == o.accion*/
     }
 
     public void update(Node o){
         this.accion = o.accion;
         this.coste_camino = o.coste_camino;
         this.coste_total = o.coste_total;
+        this.orientacion = o.orientacion;
     }
 
     public double getCoste_total() {
