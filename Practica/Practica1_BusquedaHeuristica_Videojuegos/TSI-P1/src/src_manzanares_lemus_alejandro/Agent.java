@@ -13,9 +13,14 @@ import static java.util.Collections.*;
 import static ontology.Types.*;
 
 public class Agent extends AbstractPlayer {
-  Vector2d fescala;
-  Vector2d portal;
-  ArrayList<ACTIONS> ruta;
+  private Vector2d fescala;
+  private Vector2d portal;
+  private ArrayList<ACTIONS> ruta;
+  private boolean ruta_completa = false;
+  private ArrayList<Node> cerrados = new ArrayList<Node>();
+  private ArrayList<Node> abiertos = new ArrayList<Node>();
+  private ArrayList<Observation>[][] obv;
+  private ArrayList<ACTIONS> acciones;
 
   public Agent(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     fescala = new Vector2d(stateObs.getWorldDimension().width / stateObs.getObservationGrid().length ,
@@ -33,8 +38,15 @@ public class Agent extends AbstractPlayer {
     System.out.print(" x ");
     System.out.println(stateObs.getObservationGrid()[0].length);
 
-    //ruta = new ArrayList<ACTIONS>();
-    ruta = A_estrella(portal,stateObs,elapsedTimer);
+    Vector2d pos = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
+    Vector2d ori = new Vector2d(stateObs.getAvatarOrientation());
+    Node padre = new Node(stateObs, ori, pos, portal, new ArrayList<ACTIONS>());
+    abiertos.add(padre);
+
+    ruta = new ArrayList<ACTIONS>();
+    obv = stateObs.getObservationGrid();
+    acciones = stateObs.getAvailableActions();
+    //ruta = A_estrella(portal,stateObs,elapsedTimer);
   }
 
   public void init(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
@@ -56,39 +68,32 @@ public class Agent extends AbstractPlayer {
   }
 
   public ArrayList<ACTIONS> A_estrella (Vector2d destino, StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
-    ArrayList<Node> cerrados = new ArrayList<Node>();
-    ArrayList<Node> abiertos = new ArrayList<Node>();
+    stateObs.advance(ACTIONS.ACTION_NIL);
     ArrayList<ACTIONS> path = new ArrayList<ACTIONS>();
-    ArrayList<Observation>[][] obv = stateObs.getObservationGrid();
-    ArrayList<ACTIONS> acciones = stateObs.getAvailableActions();
-    Vector2d pos_inicial = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
-    Vector2d ori_inicial = new Vector2d(stateObs.getAvatarOrientation());
-    Node padre = new Node(stateObs, ori_inicial,pos_inicial,destino,path);
     Node actual;
     boolean encontrado = false;
     boolean salir = false;
     int n_new = 0;
     int n_upt = 0;
 
-    abiertos.add(padre);
-    //System.out.println(padre.toString());
-    stateObs.advance(ACTIONS.ACTION_NIL);
-
     System.out.print("Portal: (");
     System.out.print(destino.x);
     System.out.print(", ");
     System.out.print(destino.y);
     System.out.println(")");
+
     do{
       actual = abiertos.get(0);
       cerrados.add(actual);
       abiertos.remove(0);
+
       for(int i = 0; i < acciones.size(); i++){
         //System.out.println(acciones.get(i));
         Vector2d new_pos = new Vector2d(actual.getPosicion());
         Vector2d new_ori = new Vector2d(actual.getOrientacion());
-        Types.ACTIONS elegida;
+
         if (acciones.get(i) != ACTIONS.ACTION_USE){
+
           if (acciones.get(i) == ACTIONS.ACTION_RIGHT) {
             new_pos.x = new_pos.x + 1;
           } else if (acciones.get(i) == ACTIONS.ACTION_LEFT) {
@@ -98,13 +103,22 @@ public class Agent extends AbstractPlayer {
           } else if (acciones.get(i) == ACTIONS.ACTION_DOWN) {
             new_pos.y = new_pos.y + 1;
           }
-          int tipo = (obv[(int) new_pos.x][(int) new_pos.y]).get(0).itype;
+
+          int tipo;
+          if((obv[(int) new_pos.x][(int) new_pos.y]).size() > 0){
+            tipo = (obv[(int) new_pos.x][(int) new_pos.y]).get(0).itype;
+          } else {
+            tipo = 2;
+          }
+
           if(tipo != 0) {
             ArrayList<ACTIONS> camino_actual = new ArrayList<ACTIONS>(actual.getAccion());
             camino_actual.add(acciones.get(i));
+
             if(!misma_orientacion_accion(new_ori,acciones.get(i))){
               camino_actual.add(acciones.get(i));
             }
+
             if (acciones.get(i) == ACTIONS.ACTION_RIGHT) {
               new_ori.x = 1;
               new_ori.y = 0;
@@ -118,22 +132,29 @@ public class Agent extends AbstractPlayer {
               new_ori.x = 0;
               new_ori.y = 1;
             }
+
             Node hijo = new Node(stateObs, new_ori, new_pos, destino, camino_actual);
             encontrado = false;
             salir = false;
+
             for(int j = 0; j < cerrados.size() && !encontrado; j++){
               if(hijo.equals(cerrados.get(j))){
                 encontrado = true;
               }
             }
+
             if(!encontrado){
+
               for(int j = 0; j < abiertos.size() && abiertos.size() > 0 && !salir; j++){
+
                 if(hijo.equals(abiertos.get(j)) && hijo.getCoste_camino() < abiertos.get(j).getCoste_camino()){
                   abiertos.get(j).update(hijo);
                   n_upt++;
                   salir = true;
                 }
+
               }
+
               if (!salir) {
                 n_new++;
                 abiertos.add(hijo);
@@ -142,12 +163,22 @@ public class Agent extends AbstractPlayer {
           }
         }
       }
+
       sort(abiertos);
+
     }while(actual.getTipo() != 5 && elapsedTimer.remainingTimeMillis() > 0);
 
-    //System.out.println(actual.toString());
+    if(actual.getTipo() == 5){
+      ruta_completa = true;
+    }
 
-    path = new ArrayList<ACTIONS>(actual.getAccion());
+    if(ruta_completa){
+      path = new ArrayList<ACTIONS>(actual.getAccion());
+    } else {
+      path = new ArrayList<ACTIONS>();
+      path.add(ACTIONS.ACTION_NIL);
+    }
+
     System.out.println(elapsedTimer.elapsedMillis());
     System.out.println(elapsedTimer.remainingTimeMillis());
     //System.out.println(n_new);
@@ -157,7 +188,7 @@ public class Agent extends AbstractPlayer {
   }
 
   public ACTIONS act( StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
-    if(ruta.size() == 0){
+    if(!ruta_completa){
       ruta = A_estrella(portal,stateObs,elapsedTimer);
     }
     ACTIONS accion = ruta.get(0);
