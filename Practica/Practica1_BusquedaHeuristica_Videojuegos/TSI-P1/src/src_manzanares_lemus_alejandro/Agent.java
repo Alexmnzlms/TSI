@@ -35,6 +35,7 @@ public class Agent extends AbstractPlayer {
   private ArrayList<Vector2d> gemas;
   private int gemas_recogidas = 0;
   private boolean gema_encontrada = false;
+  private ArrayList<ArrayList<Double>> matriz_distancias = new ArrayList<>();
 
 
 
@@ -85,6 +86,15 @@ public class Agent extends AbstractPlayer {
       obv = stateObs.getObservationGrid();
       acciones = stateObs.getAvailableActions();
       gemas = new ArrayList<Vector2d>();
+      matriz_distancias = new ArrayList<>();
+
+      calcular_distancias_gemas(stateObs,elapsedTimer);
+      for(int i = 0; i < gemas.size(); i++){
+        for(int j = 0; j < gemas.size(); j++){
+          System.out.print(" " + matriz_distancias.get(i).get(j) + " ");
+        }
+        System.out.println();
+      }
     }
 
   }
@@ -229,13 +239,117 @@ public class Agent extends AbstractPlayer {
     return path;
   }
 
+  public double A_estrella_pos (Node padre, Vector2d destino, StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
+    abiertos.clear();
+    cerrados.clear();
+    abiertos.add(padre);
+    ArrayList<ACTIONS> path = new ArrayList<ACTIONS>();
+    Node actual;
+    boolean encontrado = false;
+    boolean salir = false;
+
+    do{
+      actual = abiertos.get(0);
+      cerrados.add(actual);
+      abiertos.remove(0);
+
+      Iterator<ACTIONS> it_acc = acciones.iterator();
+      while(it_acc.hasNext()){
+        ACTIONS accion = it_acc.next();
+        Vector2d new_pos = new Vector2d(actual.getPosicion());
+        Vector2d new_ori = new Vector2d(actual.getOrientacion());
+
+        if (accion != ACTIONS.ACTION_USE){
+
+          if (accion == ACTIONS.ACTION_RIGHT) {
+            new_pos.x = new_pos.x + 1;
+          } else if (accion == ACTIONS.ACTION_LEFT) {
+            new_pos.x = new_pos.x - 1;
+          } else if (accion == ACTIONS.ACTION_UP) {
+            new_pos.y = new_pos.y - 1;
+          } else if (accion == ACTIONS.ACTION_DOWN) {
+            new_pos.y = new_pos.y + 1;
+          }
+
+          int tipo;
+          if((obv[(int) new_pos.x][(int) new_pos.y]).size() > 0){
+            tipo = (obv[(int) new_pos.x][(int) new_pos.y]).get(0).itype;
+          } else {
+            tipo = 2;
+          }
+
+          if(tipo != 0) {
+            ArrayList<ACTIONS> camino_actual = new ArrayList<ACTIONS>(actual.getAccion());
+            camino_actual.add(accion);
+
+            Node hijo = new Node(tipo, new_ori, new_pos, destino, camino_actual);
+            encontrado = false;
+            salir = false;
+
+            Iterator<Node> it_cerrados = cerrados.iterator();
+            while(it_cerrados.hasNext() && !encontrado){
+              Node i = it_cerrados.next();
+              if(hijo.equals(i))
+                encontrado = true;
+            }
+
+            if(!encontrado){
+              Iterator<Node> it_abiertos = abiertos.iterator();
+              while(it_abiertos.hasNext() && !salir){
+                Node j = it_abiertos.next();
+                if(hijo.equals(j) && hijo.getCoste_camino() < j.getCoste_camino()){
+                  j.update(hijo);
+                  salir = true;
+                }
+              }
+
+              if (!salir) {
+                abiertos.add(hijo);
+              }
+            }
+          }
+        }
+      }
+      sort(abiertos);
+
+    }while((actual.getPosicion().x != destino.x || actual.getPosicion().y != destino.y) && elapsedTimer.remainingTimeMillis() > 10);
+
+    return actual.getCoste_total();
+
+
+  }
+
   public void calcular_posicion_gemas(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
     ArrayList<Observation>[] g = stateObs.getResourcesPositions(stateObs.getAvatarPosition());
+    gemas.add(new Vector2d(stateObs.getAvatarPosition().x/fescala.x,stateObs.getAvatarPosition().y/fescala.y));
     for(int i = 0; i < g[0].size(); i++){
       gemas.add(new Vector2d(g[0].get(i).position.x / fescala.x ,g[0].get(i).position.y/fescala.x));
     }
+    gemas.add(new Vector2d(portal.x,portal.y));
+
   }
 
+  public void calcular_distancias_gemas(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
+    calcular_posicion_gemas(stateObs,elapsedTimer);
+
+    for(int i = 0; i < gemas.size()+2; i++){
+      matriz_distancias.add(new ArrayList<>());
+    }
+
+    for(int i = 0; i < gemas.size(); i++){
+      for(int j = 0; j < gemas.size(); j++){
+        if(i != j){
+          Node gema = new Node(6, new Vector2d(1,0), gemas.get(i), gemas.get(j), new ArrayList<ACTIONS>());
+          matriz_distancias.get(i).add(A_estrella_pos(gema, gemas.get(j), stateObs, elapsedTimer));
+        } else {
+          matriz_distancias.get(i).add(1000.0);
+        }
+      }
+    }
+
+    ArrayList<Vector2d> objetivos = new ArrayList<Vector2d>();
+
+  }
 
   public ACTIONS act( StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     if(estado == Nivel.DS){
@@ -251,10 +365,6 @@ public class Agent extends AbstractPlayer {
       return accion;
 
     } else if (estado == Nivel.DC){
-
-      if(gemas.size() == 0){
-        calcular_posicion_gemas(stateObs,elapsedTimer);
-      }
 
       if(!ruta_completa && ruta.size() == 0){
         System.out.println(gemas_recogidas);
