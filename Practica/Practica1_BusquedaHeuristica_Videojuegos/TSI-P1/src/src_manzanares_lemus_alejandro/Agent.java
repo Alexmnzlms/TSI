@@ -5,6 +5,7 @@ import core.game.StateObservation;
 import core.player.AbstractPlayer;
 import ontology.Types;
 import tools.ElapsedCpuTimer;
+import tools.Pair;
 import tools.Vector2d;
 
 import java.awt.*;
@@ -228,18 +229,13 @@ public class Agent extends AbstractPlayer {
     return path;
   }
 
-  public void calcular_posicion_gemas(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
-    for(int i = 0; i < obv.length; i++) {
-      for (int j = 0; j < obv[i].length; j++) {
-        if ((obv[i][j]).size() > 0) {
-          if (obv[i][j].get(0).itype == 6) {
-            System.out.println(i + ", " + j);
-            gemas.add(new Vector2d(i, j));
-          }
-        }
-      }
+  public void calcular_posicion_gemas(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
+    ArrayList<Observation>[] g = stateObs.getResourcesPositions(stateObs.getAvatarPosition());
+    for(int i = 0; i < g[0].size(); i++){
+      gemas.add(new Vector2d(g[0].get(i).position.x / fescala.x ,g[0].get(i).position.y/fescala.x));
     }
   }
+
 
   public ACTIONS act( StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     if(estado == Nivel.DS){
@@ -286,6 +282,7 @@ public class Agent extends AbstractPlayer {
       ACTIONS accion = ruta.get(0);
       //System.out.println(ruta.get(0));
       ruta.remove(0);
+
       return accion;
 
     }
