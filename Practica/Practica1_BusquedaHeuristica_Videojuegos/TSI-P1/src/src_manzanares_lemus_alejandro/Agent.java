@@ -7,14 +7,22 @@ import ontology.Types;
 import tools.ElapsedCpuTimer;
 import tools.Vector2d;
 
+import java.awt.*;
 import java.util.*;
 
 import static java.util.Collections.*;
 import static ontology.Types.*;
 
+enum Nivel{
+  DS, DC, RS, RC, RD
+}
+
 public class Agent extends AbstractPlayer {
+  private Nivel estado = Nivel.DC;
+
   private Vector2d fescala;
   private Vector2d portal;
+
   private ArrayList<ACTIONS> ruta;
   private boolean ruta_completa = false;
   private ArrayList<Node> cerrados = new ArrayList<Node>();
@@ -23,31 +31,60 @@ public class Agent extends AbstractPlayer {
   private ArrayList<ACTIONS> acciones;
   private long tiempo = 0;
 
+  private ArrayList<Vector2d> gemas;
+  private int gemas_recogidas = 0;
+
+
+
   public Agent(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     fescala = new Vector2d(stateObs.getWorldDimension().width / stateObs.getObservationGrid().length ,
             stateObs.getWorldDimension().height / stateObs.getObservationGrid()[0].length);
 
-    //Se crea una lista de observaciones de portales, ordenada por cercania al avatar
-    ArrayList<Observation>[] posiciones = stateObs.getPortalsPositions(stateObs.getAvatarPosition());
-    //Seleccionamos el portal mas proximo
-    portal = posiciones[0].get(0).position;
-    portal.x = Math.floor(portal.x / fescala.x);
-    portal.y = Math.floor(portal.y / fescala.y);
+    if(estado == Nivel.DS){
+      ArrayList<Observation>[] posiciones = stateObs.getPortalsPositions(stateObs.getAvatarPosition());
 
-    System.out.print("Mundo: ");
-    System.out.print(stateObs.getObservationGrid().length);
-    System.out.print(" x ");
-    System.out.println(stateObs.getObservationGrid()[0].length);
+      portal = posiciones[0].get(0).position;
+      portal.x = Math.floor(portal.x / fescala.x);
+      portal.y = Math.floor(portal.y / fescala.y);
 
-    Vector2d pos = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
-    Vector2d ori = new Vector2d(stateObs.getAvatarOrientation());
-    Node padre = new Node(1, ori, pos, portal, new ArrayList<ACTIONS>());
-    abiertos.add(padre);
+      System.out.print("Mundo: ");
+      System.out.print(stateObs.getObservationGrid().length);
+      System.out.print(" x ");
+      System.out.println(stateObs.getObservationGrid()[0].length);
 
-    ruta = new ArrayList<ACTIONS>();
-    obv = stateObs.getObservationGrid();
-    acciones = stateObs.getAvailableActions();
-    //ruta = A_estrella(portal,stateObs,elapsedTimer);
+      Vector2d pos = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
+      Vector2d ori = new Vector2d(stateObs.getAvatarOrientation());
+      Node padre = new Node(1, ori, pos, portal, new ArrayList<ACTIONS>());
+      abiertos.add(padre);
+
+      //ruta = new ArrayList<ACTIONS>();
+      obv = stateObs.getObservationGrid();
+      acciones = stateObs.getAvailableActions();
+      ruta = A_estrella(portal,stateObs,elapsedTimer);
+
+    } else if(estado == Nivel.DC){
+      ArrayList<Observation>[] posiciones = stateObs.getPortalsPositions(stateObs.getAvatarPosition());
+
+      portal = posiciones[0].get(0).position;
+      portal.x = Math.floor(portal.x / fescala.x);
+      portal.y = Math.floor(portal.y / fescala.y);
+
+      System.out.print("Mundo: ");
+      System.out.print(stateObs.getObservationGrid().length);
+      System.out.print(" x ");
+      System.out.println(stateObs.getObservationGrid()[0].length);
+
+      Vector2d pos = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
+      Vector2d ori = new Vector2d(stateObs.getAvatarOrientation());
+      Node padre = new Node(1, ori, pos, portal, new ArrayList<ACTIONS>());
+      abiertos.add(padre);
+
+      ruta = new ArrayList<ACTIONS>();
+      obv = stateObs.getObservationGrid();
+      acciones = stateObs.getAvailableActions();
+      gemas = new ArrayList<Vector2d>();
+    }
+
   }
 
   public void init(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
@@ -73,6 +110,9 @@ public class Agent extends AbstractPlayer {
     Node actual;
     boolean encontrado = false;
     boolean salir = false;
+    int tipo_dest = (obv[(int) destino.x][(int) destino.y]).get(0).itype;
+
+    System.out.println("Calculando ruta a: (" + destino.x + "," + destino.y + ")");
 
     //sort(abiertos);
     do{
@@ -157,11 +197,11 @@ public class Agent extends AbstractPlayer {
       }
       sort(abiertos);
 
-    }while(actual.getTipo() != 5 && elapsedTimer.remainingTimeMillis() > 10);
+    }while(actual.getTipo() != tipo_dest && elapsedTimer.remainingTimeMillis() > 10);
 
     tiempo += elapsedTimer.elapsedMillis();
 
-    if(actual.getTipo() == 5){
+    if(actual.getTipo() == tipo_dest){
       ruta_completa = true;
     }
 
@@ -175,16 +215,54 @@ public class Agent extends AbstractPlayer {
     return path;
   }
 
+  public void calcular_posicion_gemas(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
+    for(int i = 0; i < obv.length; i++) {
+      for (int j = 0; j < obv[i].length; j++) {
+        if ((obv[i][j]).size() > 0) {
+          if (obv[i][j].get(0).itype == 6) {
+            System.out.println(i + ", " + j);
+            gemas.add(new Vector2d(i, j));
+          }
+        }
+      }
+    }
+  }
+
   public ACTIONS act( StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
-    if(!ruta_completa && ruta.size() == 0){
-      ruta = A_estrella(portal,stateObs,elapsedTimer);
+    if(estado == Nivel.DS){
+
+      if(!ruta_completa && ruta.size() == 0){
+        ruta = A_estrella(portal,stateObs,elapsedTimer);
+      }
+      if(ruta_completa && ruta.size() == 1){
+        System.out.println("Tiempo de A*: " + tiempo + "ms.");
+      }
+      ACTIONS accion = ruta.get(0);
+      System.out.println(ruta.get(0));
+      ruta.remove(0);
+      return accion;
+
+    } else if (estado == Nivel.DC){
+
+      if(gemas.size() == 0){
+        calcular_posicion_gemas(stateObs,elapsedTimer);
+      }
+
+      if(!ruta_completa && ruta.size() == 0){
+        ruta = A_estrella(gemas.get(0),stateObs,elapsedTimer);
+        gemas_recogidas++;
+      }
+      if(ruta_completa && ruta.size() == 0){
+        System.out.println("Tiempo de A*: " + tiempo + "ms.");
+      }
+      System.out.println(gemas_recogidas);
+      ACTIONS accion = ruta.get(0);
+      System.out.println(ruta.get(0));
+      ruta.remove(0);
+      return accion;
+
     }
-    if(ruta_completa && ruta.size() == 1){
-      System.out.println("Tiempo de A*: " + tiempo + "ms.");
-    }
-    ACTIONS accion = ruta.get(0);
-    System.out.println(ruta.get(0));
-    ruta.remove(0);
-    return accion;
+
+    return ACTIONS.ACTION_NIL;
   }
 }
