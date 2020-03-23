@@ -23,4 +23,24 @@ public class Gem implements Comparable<Gem>{
             return 1;
         return 0;
     }
+
+    public double getPeso(){
+        return peso;
+    }
+
+    public int getGem_size(){
+        return gems.size();
+    }
+
+    public ArrayList<Integer> getGems(){
+        return gems;
+    }
+
+    @Override
+    public String toString() {
+        return "Gema{" +
+                "peso=" + peso +
+                ", gems=" + gems +
+                "}\n";
+    }
 }

@@ -9,6 +9,7 @@ import tools.Pair;
 import tools.Vector2d;
 
 import java.awt.*;
+import java.awt.desktop.SystemEventListener;
 import java.util.*;
 
 import static java.util.Collections.*;
@@ -347,8 +348,42 @@ public class Agent extends AbstractPlayer {
       }
     }
 
-    ArrayList<Vector2d> objetivos = new ArrayList<Vector2d>();
+    ArrayList<Gem> posibles = new ArrayList<>();
+    ArrayList<Gem> explorados = new ArrayList<>();
 
+    for(int i = 1; i < matriz_distancias.get(0).size() - 1; i++){
+      ArrayList<Integer> index = new ArrayList<>();
+      index.add(i);
+      Gem gema_actual = new Gem(index,matriz_distancias.get(0).get(i));
+      posibles.add(gema_actual);
+    }
+    sort(posibles);
+    Gem actual = posibles.get(0);;
+    while(actual.getGem_size() != 10){
+      explorados.add(actual);
+
+      for(int i = 1; i < gemas.size() - 1; i++){
+        if(!actual.gems.contains(i)){
+          ArrayList<Integer> indices_actual = new ArrayList<>(actual.getGems());
+          indices_actual.add(i);
+          Gem hijo = new Gem(indices_actual, actual.getPeso()+matriz_distancias.get(0).get(i));
+          posibles.add(hijo);
+        }
+      }
+      sort(posibles);
+      actual = posibles.get(0);
+      posibles.remove(0);
+    }
+
+    ArrayList<Vector2d> gemas_def = new ArrayList<>();
+
+    for(int i = 0; i < actual.getGem_size(); i++){
+      gemas_def.add(gemas.get(actual.getGems().get(i)));
+    }
+    gemas_def.add(new Vector2d(portal.x,portal.y));
+
+    gemas.clear();
+    gemas = new ArrayList<>(gemas_def);
   }
 
   public ACTIONS act( StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
