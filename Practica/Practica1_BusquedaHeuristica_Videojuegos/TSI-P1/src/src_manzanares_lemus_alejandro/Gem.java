@@ -15,6 +15,11 @@ public class Gem implements Comparable<Gem>{
         this.peso = peso;
     }
 
+    public Gem(Gem o){
+        this.gems = new ArrayList<>(o.gems);
+        this.peso = o.peso;
+    }
+
     @Override
     public int compareTo(Gem g) {
         if(this.peso < g.peso)

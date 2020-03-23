@@ -89,13 +89,15 @@ public class Agent extends AbstractPlayer {
       gemas = new ArrayList<Vector2d>();
       matriz_distancias = new ArrayList<>();
 
+      System.out.println("A");
       calcular_distancias_gemas(stateObs,elapsedTimer);
-      for(int i = 0; i < gemas.size(); i++){
+      System.out.println("B");
+      /*for(int i = 0; i < gemas.size(); i++){
         for(int j = 0; j < gemas.size(); j++){
           System.out.print(" " + matriz_distancias.get(i).get(j) + " ");
         }
         System.out.println();
-      }
+      }*/
     }
 
   }
@@ -313,7 +315,7 @@ public class Agent extends AbstractPlayer {
       }
       sort(abiertos);
 
-    }while((actual.getPosicion().x != destino.x || actual.getPosicion().y != destino.y) && elapsedTimer.remainingTimeMillis() > 10);
+    }while((actual.getPosicion().x != destino.x || actual.getPosicion().y != destino.y));
 
     return actual.getCoste_total();
 
@@ -332,6 +334,7 @@ public class Agent extends AbstractPlayer {
 
   public void calcular_distancias_gemas(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     calcular_posicion_gemas(stateObs,elapsedTimer);
+    System.out.println("C");
 
     for(int i = 0; i < gemas.size()+2; i++){
       matriz_distancias.add(new ArrayList<>());
@@ -359,15 +362,31 @@ public class Agent extends AbstractPlayer {
     }
     sort(posibles);
     Gem actual = posibles.get(0);;
+    posibles.remove(0);
     while(actual.getGem_size() != 10){
+      System.out.println(actual);
       explorados.add(actual);
 
+      
+      Gem hijo_mejor = new Gem(actual);
+      boolean primero = true;
       for(int i = 1; i < gemas.size() - 1; i++){
-        if(!actual.gems.contains(i)){
+        if(!actual.getGems().contains(i)){
           ArrayList<Integer> indices_actual = new ArrayList<>(actual.getGems());
           indices_actual.add(i);
           Gem hijo = new Gem(indices_actual, actual.getPeso()+matriz_distancias.get(0).get(i));
-          posibles.add(hijo);
+          if(primero){
+            hijo_mejor = new Gem(hijo);
+            posibles.add(hijo);
+            primero = false;
+          }else {
+            if(hijo.getPeso() < hijo_mejor.getGem_size()){
+              posibles.add(hijo);
+              hijo_mejor =new Gem(hijo);
+            }
+          }
+          
+
         }
       }
       sort(posibles);
