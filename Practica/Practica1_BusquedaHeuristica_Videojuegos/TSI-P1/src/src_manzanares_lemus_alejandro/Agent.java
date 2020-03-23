@@ -33,6 +33,7 @@ public class Agent extends AbstractPlayer {
 
   private ArrayList<Vector2d> gemas;
   private int gemas_recogidas = 0;
+  private boolean gema_encontrada = false;
 
 
 
@@ -110,9 +111,12 @@ public class Agent extends AbstractPlayer {
     Node actual;
     boolean encontrado = false;
     boolean salir = false;
+    boolean objetivo_alcanzado = false;
     int tipo_dest = (obv[(int) destino.x][(int) destino.y]).get(0).itype;
 
-    System.out.println("Calculando ruta a: (" + destino.x + "," + destino.y + ")");
+    System.out.println("(" + stateObs.getAvatarPosition().x/fescala.x + ","
+            + stateObs.getAvatarPosition().y/fescala.y + ")"
+            + " -> " + "(" + destino.x + "," + destino.y + ")");
 
     //sort(abiertos);
     do{
@@ -197,16 +201,25 @@ public class Agent extends AbstractPlayer {
       }
       sort(abiertos);
 
-    }while(actual.getTipo() != tipo_dest && elapsedTimer.remainingTimeMillis() > 10);
+    }while((actual.getPosicion().x != destino.x || actual.getPosicion().y != destino.y) && elapsedTimer.remainingTimeMillis() > 10);
 
     tiempo += elapsedTimer.elapsedMillis();
 
-    if(actual.getTipo() == tipo_dest){
+    if(actual.getPosicion().x == destino.x && actual.getPosicion().y == destino.y){
       ruta_completa = true;
+    }
+
+    if((obv[(int) actual.getPosicion().x][(int) actual.getPosicion().y]).size() > 0){
+      if((obv[(int) actual.getPosicion().x][(int) actual.getPosicion().y]).get(0).itype == 6){
+        gema_encontrada = true;
+        System.out.println("Gema encontrada");
+      }
     }
 
     if(ruta_completa){
       path = new ArrayList<ACTIONS>(actual.getAccion());
+      System.out.println("Camino encontrado");
+      ruta_completa = false;
     } else {
       path = new ArrayList<ACTIONS>();
       path.add(ACTIONS.ACTION_NIL);
@@ -233,10 +246,9 @@ public class Agent extends AbstractPlayer {
 
       if(!ruta_completa && ruta.size() == 0){
         ruta = A_estrella(portal,stateObs,elapsedTimer);
-      }
-      if(ruta_completa && ruta.size() == 1){
         System.out.println("Tiempo de A*: " + tiempo + "ms.");
       }
+
       ACTIONS accion = ruta.get(0);
       System.out.println(ruta.get(0));
       ruta.remove(0);
@@ -249,15 +261,30 @@ public class Agent extends AbstractPlayer {
       }
 
       if(!ruta_completa && ruta.size() == 0){
-        ruta = A_estrella(gemas.get(0),stateObs,elapsedTimer);
-        gemas_recogidas++;
+        System.out.println(gemas_recogidas);
+        abiertos.clear();
+        cerrados.clear();
+        Vector2d pos = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
+        Vector2d ori = new Vector2d(stateObs.getAvatarOrientation());
+        Node padre = new Node(1, ori, pos, portal, new ArrayList<ACTIONS>());
+        abiertos.add(padre);
+        if(gemas_recogidas < 10){
+          ruta = A_estrella(gemas.get(gemas_recogidas),stateObs,elapsedTimer);
+          if(gema_encontrada){
+            gemas_recogidas++;
+            gema_encontrada = false;
+          }
+        } else {
+          ruta = A_estrella(portal,stateObs,elapsedTimer);
+        }
+
       }
       if(ruta_completa && ruta.size() == 0){
         System.out.println("Tiempo de A*: " + tiempo + "ms.");
       }
-      System.out.println(gemas_recogidas);
+
       ACTIONS accion = ruta.get(0);
-      System.out.println(ruta.get(0));
+      //System.out.println(ruta.get(0));
       ruta.remove(0);
       return accion;
 
