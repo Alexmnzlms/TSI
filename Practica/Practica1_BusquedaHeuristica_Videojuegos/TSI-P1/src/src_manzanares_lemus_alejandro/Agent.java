@@ -90,15 +90,19 @@ public class Agent extends AbstractPlayer {
       matriz_distancias = new ArrayList<>();
 
       calcular_distancias_gemas(stateObs,elapsedTimer);
-      System.out.println("Numero de gemas:" + matriz_distancias.size());
+      /*System.out.println("Numero de gemas:" + matriz_distancias.size());
       for(int i = 0; i < matriz_distancias.size(); i++){
         for(int j = 0; j < matriz_distancias.size(); j++){
           System.out.print("["+i+","+j+ "]: " + matriz_distancias.get(i).get(j) + " ");
         }
         System.out.println();
       }
-      System.out.println(gemas);
+      System.out.println(gemas);*/
+    } else if(estado == Nivel.RS){
+
     }
+
+    System.out.println("Tiempo del constructor: " + elapsedTimer.elapsedMillis());
 
   }
 
@@ -330,15 +334,15 @@ public class Agent extends AbstractPlayer {
     }
     //gemas.add(new Vector2d(portal.x,portal.y));
 
-    System.out.println(gemas.size());
+    //System.out.println(gemas.size());
 
   }
 
   public void calcular_distancias_gemas(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     calcular_posicion_gemas(stateObs,elapsedTimer);
-    for(int i = 0; i < gemas.size(); i++){
+    /*for(int i = 0; i < gemas.size(); i++){
       System.out.println("[" + i + "]:" + gemas.get(i));
-    }
+    }*/
 
 
     for(int i = 0; i < gemas.size(); i++){
@@ -405,7 +409,7 @@ public class Agent extends AbstractPlayer {
       posibles.remove(0);
       //System.out.println(actual);
     }
-    System.out.println(actual);
+    //System.out.println(actual);
 
     ArrayList<Vector2d> gemas_def = new ArrayList<>();
 
@@ -429,6 +433,7 @@ public class Agent extends AbstractPlayer {
       ACTIONS accion = ruta.get(0);
       System.out.println(ruta.get(0));
       ruta.remove(0);
+      System.out.println("Tiempo act: " + elapsedTimer.elapsedMillis());
       return accion;
 
     } else if (estado == Nivel.DC){
@@ -459,7 +464,6 @@ public class Agent extends AbstractPlayer {
       ACTIONS accion = ruta.get(0);
       //System.out.println(ruta.get(0));
       ruta.remove(0);
-
       return accion;
 
     }
