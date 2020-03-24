@@ -20,7 +20,7 @@ enum Nivel{
 }
 
 public class Agent extends AbstractPlayer {
-  private Nivel estado = Nivel.RS;
+  private Nivel estado = Nivel.RD;
 
   private Vector2d fescala;
   private Vector2d portal;
@@ -46,6 +46,7 @@ public class Agent extends AbstractPlayer {
   private boolean incompletaU;
   private boolean incompletaD;
 
+  private boolean interrupcion;
 
 
 
@@ -108,8 +109,37 @@ public class Agent extends AbstractPlayer {
         System.out.println();
       }
       System.out.println(gemas);*/
-    } else if(estado == Nivel.RS){
+    } else if(estado == Nivel.RS || estado == Nivel.RC){
+
       crear_mapa_calor(stateObs,elapsedTimer);
+
+    } else if(estado == Nivel.RD){
+      ArrayList<Observation>[] posiciones = stateObs.getPortalsPositions(stateObs.getAvatarPosition());
+
+      portal = posiciones[0].get(0).position;
+      portal.x = Math.floor(portal.x / fescala.x);
+      portal.y = Math.floor(portal.y / fescala.y);
+
+      System.out.print("Mundo: ");
+      System.out.print(stateObs.getObservationGrid().length);
+      System.out.print(" x ");
+      System.out.println(stateObs.getObservationGrid()[0].length);
+
+      Vector2d pos = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
+      Vector2d ori = new Vector2d(stateObs.getAvatarOrientation());
+      Node padre = new Node(1, ori, pos, portal, new ArrayList<ACTIONS>());
+      abiertos.add(padre);
+
+      ruta = new ArrayList<ACTIONS>();
+      obv = stateObs.getObservationGrid();
+      acciones = stateObs.getAvailableActions();
+      gemas = new ArrayList<Vector2d>();
+      matriz_distancias = new ArrayList<>();
+
+      calcular_distancias_gemas(stateObs,elapsedTimer);
+      crear_mapa_calor(stateObs,elapsedTimer);
+
+      interrupcion = false;
     }
 
     System.out.println("Tiempo del constructor: " + elapsedTimer.elapsedMillis());
@@ -577,7 +607,7 @@ public class Agent extends AbstractPlayer {
       ruta.remove(0);
       return accion;
 
-    } else if (estado == Nivel.RS) {
+    } else if (estado == Nivel.RS || estado == Nivel.RC) {
       ACTIONS accion = ACTIONS.ACTION_USE;
 
       avatar = stateObs.getAvatarPosition();
@@ -698,6 +728,159 @@ public class Agent extends AbstractPlayer {
       mapa_de_calor.clear();
       crear_mapa_calor(stateObs,elapsedTimer);
       return accion;
+
+    } else if(estado == Nivel.RD){
+      avatar = stateObs.getAvatarPosition();
+      avatar.x = avatar.x / fescala.x;
+      avatar.y = avatar.y / fescala.y;
+      peligro_actual = mapa_de_calor.get((int) avatar.y).get((int) avatar.x);
+
+      System.out.println("Nivel de peligro actual: " + peligro_actual);
+      System.out.println("Posicion: " + avatar);
+      System.out.println("Orientacion: " + stateObs.getAvatarOrientation());
+
+      if(peligro_actual > 0){
+        System.out.println("TENGO MIEDO EN ESTE MOMENTO");
+        System.out.println("-----------------------------");
+        //if(obv[(int)avatar.y][(int)(avatar.x+1)].size() != 0){
+        if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_RIGHT)){
+          if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_RIGHT, stateObs)){
+            mapa_de_calor.clear();
+            crear_mapa_calor(stateObs,elapsedTimer);
+            ruta_completa = false;
+            interrupcion = true;
+            ruta.clear();
+            return ACTIONS.ACTION_RIGHT;
+          }
+        } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_LEFT)){
+          if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
+            mapa_de_calor.clear();
+            crear_mapa_calor(stateObs,elapsedTimer);
+            ruta_completa = false;
+            interrupcion = true;
+            ruta.clear();
+            return ACTIONS.ACTION_LEFT;
+          }
+        } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_UP)){
+          if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
+            mapa_de_calor.clear();
+            crear_mapa_calor(stateObs,elapsedTimer);
+            ruta_completa = false;
+            interrupcion = true;
+            ruta.clear();
+            return ACTIONS.ACTION_UP;
+          }
+        } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_DOWN)){
+          if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
+            mapa_de_calor.clear();
+            crear_mapa_calor(stateObs,elapsedTimer);
+            ruta_completa = false;
+            interrupcion = true;
+            ruta.clear();
+            return ACTIONS.ACTION_DOWN;
+          }
+        }
+
+        if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_RIGHT, stateObs)){
+          mapa_de_calor.clear();
+          crear_mapa_calor(stateObs,elapsedTimer);
+          ruta_completa = false;
+          interrupcion = true;
+          ruta.clear();
+          return ACTIONS.ACTION_RIGHT;
+
+        } else if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
+          mapa_de_calor.clear();
+          crear_mapa_calor(stateObs,elapsedTimer);
+          ruta_completa = false;
+          interrupcion = true;
+          ruta.clear();
+          return ACTIONS.ACTION_LEFT;
+
+        } else if(peligro_actual > mapa_de_calor.get((int) (avatar.y+1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
+          mapa_de_calor.clear();
+          crear_mapa_calor(stateObs,elapsedTimer);
+          ruta_completa = false;
+          interrupcion = true;
+          ruta.clear();
+          return ACTIONS.ACTION_DOWN;
+
+        } else if(peligro_actual > mapa_de_calor.get((int) (avatar.y-1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
+          mapa_de_calor.clear();
+          crear_mapa_calor(stateObs,elapsedTimer);
+          ruta_completa = false;
+          interrupcion = true;
+          ruta.clear();
+          return ACTIONS.ACTION_UP;
+
+        } else {
+          if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_RIGHT)){
+            mapa_de_calor.clear();
+            crear_mapa_calor(stateObs,elapsedTimer);
+            ruta_completa = false;
+            interrupcion = true;
+            ruta.clear();
+            return ACTIONS.ACTION_RIGHT;
+          } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_LEFT)){
+            mapa_de_calor.clear();
+            crear_mapa_calor(stateObs,elapsedTimer);
+            ruta_completa = false;
+            interrupcion = true;
+            ruta.clear();
+            return ACTIONS.ACTION_LEFT;
+
+          } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_UP)){
+            mapa_de_calor.clear();
+            crear_mapa_calor(stateObs,elapsedTimer);
+            ruta_completa = false;
+            interrupcion = true;
+            ruta.clear();
+            return ACTIONS.ACTION_UP;
+
+          } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_DOWN)){
+            mapa_de_calor.clear();
+            crear_mapa_calor(stateObs,elapsedTimer);
+            ruta_completa = false;
+            interrupcion = true;
+            ruta.clear();
+            return ACTIONS.ACTION_DOWN;
+
+          }
+        }
+      } else {
+        mapa_de_calor.clear();
+        crear_mapa_calor(stateObs,elapsedTimer);
+        if(!ruta_completa && ruta.size() == 0){
+          System.out.println(gemas_recogidas);
+          abiertos.clear();
+          cerrados.clear();
+          Vector2d pos = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
+          Vector2d ori = new Vector2d(stateObs.getAvatarOrientation());
+          Node padre = new Node(1, ori, pos, portal, new ArrayList<ACTIONS>());
+          abiertos.add(padre);
+          if(gemas_recogidas < 10){
+            ruta = A_estrella(gemas.get(gemas_recogidas),stateObs,elapsedTimer);
+            if(gema_encontrada && !interrupcion){
+              gemas_recogidas++;
+              gema_encontrada = false;
+              interrupcion = false;
+            }
+          } else {
+            ruta = A_estrella(portal,stateObs,elapsedTimer);
+          }
+
+        }
+        if(ruta_completa && ruta.size() == 0){
+          System.out.println("Tiempo de A*: " + tiempo + "ms.");
+        }
+
+        ACTIONS accion = ruta.get(0);
+        //System.out.println(ruta.get(0));
+        ruta.remove(0);
+        return accion;
+      }
+
+
     }
 
     return ACTIONS.ACTION_NIL;
