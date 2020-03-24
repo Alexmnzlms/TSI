@@ -452,7 +452,7 @@ public class Agent extends AbstractPlayer {
         }
       }
     }
-    mapa_de_calor.get(1).set(1,6);
+    mapa_de_calor.get(1).set(1,3);
     mapa_de_calor.get(1).set((stateObs.getObservationGrid().length - 2),3);
     mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 2).set(1,3);
     mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 2).set((stateObs.getObservationGrid().length - 2),3);
@@ -484,9 +484,9 @@ public class Agent extends AbstractPlayer {
             }else if(i == (int)(pos_enemigo.x-2) || j == (int)(pos_enemigo.y-2) || i == (int)(pos_enemigo.x+2) || j == (int)(pos_enemigo.y+2)){
               mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+2);
             } else if (i == (int)pos_enemigo.x && j == (int)(pos_enemigo.y)){
-              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+4);
+              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+6);
             } else {
-              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+3);
+              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+4);
             }
           }
         }
@@ -666,24 +666,24 @@ public class Agent extends AbstractPlayer {
           if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_RIGHT)){
             mapa_de_calor.clear();
             crear_mapa_calor(stateObs,elapsedTimer);
-            incompletaR = true;
+            //incompletaR = true;
             return ACTIONS.ACTION_RIGHT;
           } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_LEFT)){
             mapa_de_calor.clear();
             crear_mapa_calor(stateObs,elapsedTimer);
-            incompletaL = true;
+            //incompletaL = true;
             return ACTIONS.ACTION_LEFT;
 
           } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_UP)){
             mapa_de_calor.clear();
             crear_mapa_calor(stateObs,elapsedTimer);
-            incompletaU = true;
+            //incompletaU = true;
             return ACTIONS.ACTION_UP;
 
           } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_DOWN)){
             mapa_de_calor.clear();
             crear_mapa_calor(stateObs,elapsedTimer);
-            incompletaD = true;
+           //incompletaD = true;
             return ACTIONS.ACTION_DOWN;
 
           }
