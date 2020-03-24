@@ -89,15 +89,15 @@ public class Agent extends AbstractPlayer {
       gemas = new ArrayList<Vector2d>();
       matriz_distancias = new ArrayList<>();
 
-      System.out.println("A");
       calcular_distancias_gemas(stateObs,elapsedTimer);
-      System.out.println("B");
-      /*for(int i = 0; i < gemas.size(); i++){
-        for(int j = 0; j < gemas.size(); j++){
-          System.out.print(" " + matriz_distancias.get(i).get(j) + " ");
+      System.out.println("Numero de gemas:" + matriz_distancias.size());
+      for(int i = 0; i < matriz_distancias.size(); i++){
+        for(int j = 0; j < matriz_distancias.size(); j++){
+          System.out.print("["+i+","+j+ "]: " + matriz_distancias.get(i).get(j) + " ");
         }
         System.out.println();
-      }*/
+      }
+      System.out.println(gemas);
     }
 
   }
@@ -328,15 +328,20 @@ public class Agent extends AbstractPlayer {
     for(int i = 0; i < g[0].size(); i++){
       gemas.add(new Vector2d(g[0].get(i).position.x / fescala.x ,g[0].get(i).position.y/fescala.x));
     }
-    gemas.add(new Vector2d(portal.x,portal.y));
+    //gemas.add(new Vector2d(portal.x,portal.y));
+
+    System.out.println(gemas.size());
 
   }
 
   public void calcular_distancias_gemas(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     calcular_posicion_gemas(stateObs,elapsedTimer);
-    System.out.println("C");
+    for(int i = 0; i < gemas.size(); i++){
+      System.out.println("[" + i + "]:" + gemas.get(i));
+    }
 
-    for(int i = 0; i < gemas.size()+2; i++){
+
+    for(int i = 0; i < gemas.size(); i++){
       matriz_distancias.add(new ArrayList<>());
     }
 
@@ -346,7 +351,7 @@ public class Agent extends AbstractPlayer {
           Node gema = new Node(6, new Vector2d(1,0), gemas.get(i), gemas.get(j), new ArrayList<ACTIONS>());
           matriz_distancias.get(i).add(A_estrella_pos(gema, gemas.get(j), stateObs, elapsedTimer));
         } else {
-          matriz_distancias.get(i).add(1000.0);
+          matriz_distancias.get(i).add(0.0);
         }
       }
     }
@@ -354,8 +359,9 @@ public class Agent extends AbstractPlayer {
     ArrayList<Gem> posibles = new ArrayList<>();
     ArrayList<Gem> explorados = new ArrayList<>();
 
-    for(int i = 1; i < matriz_distancias.get(0).size() - 1; i++){
+    for(int i = 1; i < matriz_distancias.get(0).size(); i++){
       ArrayList<Integer> index = new ArrayList<>();
+      index.add(0);
       index.add(i);
       Gem gema_actual = new Gem(index,matriz_distancias.get(0).get(i));
       posibles.add(gema_actual);
@@ -363,40 +369,47 @@ public class Agent extends AbstractPlayer {
     sort(posibles);
     Gem actual = posibles.get(0);;
     posibles.remove(0);
-    while(actual.getGem_size() != 10){
-      System.out.println(actual);
+    //System.out.println(actual);
+
+    while(actual.getGem_size() != 11){
       explorados.add(actual);
 
-      
       Gem hijo_mejor = new Gem(actual);
       boolean primero = true;
-      for(int i = 1; i < gemas.size() - 1; i++){
+
+      for(int i = 1; i < gemas.size(); i++){
+
         if(!actual.getGems().contains(i)){
           ArrayList<Integer> indices_actual = new ArrayList<>(actual.getGems());
           indices_actual.add(i);
-          Gem hijo = new Gem(indices_actual, actual.getPeso()+matriz_distancias.get(0).get(i));
+          Gem hijo = new Gem(indices_actual, actual.getPeso()+matriz_distancias.get(actual.getGems().get(actual.getGem_size()-1)).get(i));
+          //System.out.println("Distancia de " + actual.getGems().get(actual.getGem_size()-1) + " a " + i + " = " + matriz_distancias.get(actual.getGems().get(actual.getGem_size()-1)).get(i));
+
           if(primero){
             hijo_mejor = new Gem(hijo);
             posibles.add(hijo);
             primero = false;
           }else {
-            if(hijo.getPeso() < hijo_mejor.getGem_size()){
+
+            if(hijo.getPeso() < hijo_mejor.getPeso()){
               posibles.add(hijo);
               hijo_mejor =new Gem(hijo);
             }
-          }
-          
 
+          }
         }
       }
+
       sort(posibles);
       actual = posibles.get(0);
       posibles.remove(0);
+      //System.out.println(actual);
     }
+    System.out.println(actual);
 
     ArrayList<Vector2d> gemas_def = new ArrayList<>();
 
-    for(int i = 0; i < actual.getGem_size(); i++){
+    for(int i = 1; i < actual.getGem_size(); i++){
       gemas_def.add(gemas.get(actual.getGems().get(i)));
     }
     gemas_def.add(new Vector2d(portal.x,portal.y));
