@@ -20,7 +20,7 @@ enum Nivel{
 }
 
 public class Agent extends AbstractPlayer {
-  private Nivel estado = Nivel.DC;
+  private Nivel estado = Nivel.RS;
 
   private Vector2d fescala;
   private Vector2d portal;
@@ -37,6 +37,8 @@ public class Agent extends AbstractPlayer {
   private int gemas_recogidas = 0;
   private boolean gema_encontrada = false;
   private ArrayList<ArrayList<Double>> matriz_distancias = new ArrayList<>();
+
+  private ArrayList<ArrayList<Integer>> mapa_de_calor = new ArrayList<>();
 
 
 
@@ -99,7 +101,7 @@ public class Agent extends AbstractPlayer {
       }
       System.out.println(gemas);*/
     } else if(estado == Nivel.RS){
-
+      crear_mapa_calor(stateObs,elapsedTimer);
     }
 
     System.out.println("Tiempo del constructor: " + elapsedTimer.elapsedMillis());
@@ -422,6 +424,64 @@ public class Agent extends AbstractPlayer {
     gemas = new ArrayList<>(gemas_def);
   }
 
+  public void crear_mapa_calor(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
+    ArrayList<Observation>[] enemigos = stateObs.getNPCPositions();
+    ArrayList<Observation> [][] muros = stateObs.getObservationGrid();
+    System.out.println(enemigos[0]);
+    Vector2d limites = new Vector2d(stateObs.getObservationGrid().length,stateObs.getObservationGrid()[0].length);
+    System.out.println(limites);
+
+    for(int i = 0; i < stateObs.getObservationGrid()[0].length; i++){
+      mapa_de_calor.add(new ArrayList<>());
+      for(int j = 0; j < stateObs.getObservationGrid().length; j++){
+        if(muros[j][i].size() > 0){
+          if((muros[j][i]).get(0).itype == 0){
+            mapa_de_calor.get(i).add(2);
+          } else {
+            mapa_de_calor.get(i).add(0);
+          }
+        } else {
+          mapa_de_calor.get(i).add(0);
+        }
+      }
+    }
+    mapa_de_calor.get(0).set(0,3);
+    mapa_de_calor.get(0).set((stateObs.getObservationGrid().length - 1),3);
+    mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 1).set(0,3);
+    mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 1).set((stateObs.getObservationGrid().length - 1),3);
+
+    mapa_de_calor.get(1).set(1,2);
+    mapa_de_calor.get(1).set((stateObs.getObservationGrid().length - 2),2);
+    mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 2).set(1,2);
+    mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 2).set((stateObs.getObservationGrid().length - 2),2);
+
+    Vector2d pos_enemigo = enemigos[0].get(0).position;
+    pos_enemigo.x = pos_enemigo.x / fescala.x;
+    pos_enemigo.y = pos_enemigo.y / fescala.y;
+
+    for(int i = (int)(pos_enemigo.x-2); i <= pos_enemigo.x+2; i++){
+      for (int j = (int)(pos_enemigo.y-2); j <= pos_enemigo.y+2; j++){
+        if(i >= 0 && i <= (int) limites.x && j >= 0 && j <= (int) limites.y){
+          if(i == (int)(pos_enemigo.x-2) || j == (int)(pos_enemigo.y-2) || i == (int)(pos_enemigo.x+2) || j == (int)(pos_enemigo.y+2)){
+            mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+1);
+          } else if (i == (int)pos_enemigo.x && j == (int)(pos_enemigo.y)){
+            mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+3);
+          } else {
+            mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+2);
+          }
+        }
+      }
+    }
+
+    for(int i = 0; i < mapa_de_calor.size(); i++){
+      for(int j = 0; j < mapa_de_calor.get(0).size(); j++){
+        System.out.print(mapa_de_calor.get(i).get(j) + " ");
+      }
+      System.out.println();
+    }
+
+  }
+
   public ACTIONS act( StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     if(estado == Nivel.DS){
 
@@ -466,6 +526,10 @@ public class Agent extends AbstractPlayer {
       ruta.remove(0);
       return accion;
 
+    } else if (estado == Nivel.RS) {
+      mapa_de_calor.clear();
+      crear_mapa_calor(stateObs,elapsedTimer);
+      return ACTIONS.ACTION_RIGHT;
     }
 
     return ACTIONS.ACTION_NIL;
