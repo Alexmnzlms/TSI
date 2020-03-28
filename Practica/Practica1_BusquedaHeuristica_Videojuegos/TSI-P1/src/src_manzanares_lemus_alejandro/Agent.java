@@ -20,7 +20,7 @@ enum Nivel{
 }
 
 public class Agent extends AbstractPlayer {
-  private Nivel estado = Nivel.RD;
+  private Nivel estado = Nivel.RS;
 
   private Vector2d fescala;
   private Vector2d portal;
@@ -41,11 +41,9 @@ public class Agent extends AbstractPlayer {
   private ArrayList<ArrayList<Integer>> mapa_de_calor = new ArrayList<>();
   private Vector2d avatar;
   private int peligro_actual;
+  private int mejor_peligro;
 
   private boolean interrupcion;
-
-
-
 
   public Agent(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     fescala = new Vector2d(stateObs.getWorldDimension().width / stateObs.getObservationGrid().length ,
@@ -133,7 +131,6 @@ public class Agent extends AbstractPlayer {
       matriz_distancias = new ArrayList<>();
 
       calcular_distancias_gemas(stateObs,elapsedTimer);
-      crear_mapa_calor(stateObs,elapsedTimer);
 
       interrupcion = false;
     }
@@ -460,11 +457,6 @@ public class Agent extends AbstractPlayer {
       mapa_de_calor.add(new ArrayList<>());
       for(int j = 0; j < stateObs.getObservationGrid().length; j++){
         mapa_de_calor.get(i).add(0);
-        if(stateObs.getObservationGrid()[j][i].size() > 0){
-          if(stateObs.getObservationGrid()[j][i].get(0).itype == 6){
-            mapa_de_calor.get(i).set(j,mapa_de_calor.get(i).get(j)-1);
-          }
-        }
       }
     }
     /*for(int i = 1; i < stateObs.getObservationGrid()[0].length-1; i++){
@@ -481,13 +473,14 @@ public class Agent extends AbstractPlayer {
       for(int j = 0; j < stateObs.getObservationGrid().length; j++){
         if(stateObs.getObservationGrid()[j][i].size() > 0){
           if(stateObs.getObservationGrid()[j][i].get(0).itype == 0){
-            if(j - 1 > 0){
+            mapa_de_calor.get(i).set(j,mapa_de_calor.get(i).get(j)+9);
+            if(j - 1 > -1){
               mapa_de_calor.get(i).set(j-1,mapa_de_calor.get(i).get(j-1)+1);
             }
             if(j + 1 < limites.x){
               mapa_de_calor.get(i).set(j+1,mapa_de_calor.get(i).get(j+1)+1);
             }
-            if(i -1 > 0){
+            if(i -1 > -1){
               mapa_de_calor.get(i-1).set(j,mapa_de_calor.get(i-1).get(j)+1);
             }
             if(i + 1 < limites.y){
@@ -498,10 +491,10 @@ public class Agent extends AbstractPlayer {
       }
     }
 
-    mapa_de_calor.get(1).set(1,2);
+    /*mapa_de_calor.get(1).set(1,2);
     mapa_de_calor.get(1).set((stateObs.getObservationGrid().length - 2),2);
     mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 2).set(1,2);
-    mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 2).set((stateObs.getObservationGrid().length - 2),2);
+    mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 2).set((stateObs.getObservationGrid().length - 2),2);*/
 
     /*mapa_de_calor.get(2).set(2,2);
     mapa_de_calor.get(2).set((stateObs.getObservationGrid().length - 3),2);
@@ -518,13 +511,13 @@ public class Agent extends AbstractPlayer {
         for (int j = (int)(pos_enemigo.y-3); j <= pos_enemigo.y+3; j++){
           if(i > 0 && i < (int) limites.x && j > 0 && j < (int) limites.y) {
             if(i == (int)(pos_enemigo.x-3) || j == (int)(pos_enemigo.y-3) || i == (int)(pos_enemigo.x+3) || j == (int)(pos_enemigo.y+3)){
-              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+4);
-            }else if(i == (int)(pos_enemigo.x-2) || j == (int)(pos_enemigo.y-2) || i == (int)(pos_enemigo.x+2) || j == (int)(pos_enemigo.y+2)){
               mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+5);
-            } else if (i == (int)pos_enemigo.x && j == (int)(pos_enemigo.y)){
-              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+7);
-            } else {
+            }else if(i == (int)(pos_enemigo.x-2) || j == (int)(pos_enemigo.y-2) || i == (int)(pos_enemigo.x+2) || j == (int)(pos_enemigo.y+2)){
               mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+6);
+            } else if (i == (int)pos_enemigo.x && j == (int)(pos_enemigo.y)){
+              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+8);
+            } else {
+              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+7);
             }
           }
         }
@@ -534,7 +527,7 @@ public class Agent extends AbstractPlayer {
     for(int i = 0; i < mapa_de_calor.size(); i++){
       for(int j = 0; j < mapa_de_calor.get(0).size(); j++){
         if( j == (int)(stateObs.getAvatarPosition().x/fescala.x) && i == (int)(stateObs.getAvatarPosition().y/fescala.y)){
-          System.out.print("A ");
+          System.out.print("A"+ mapa_de_calor.get(i).get(j) + " ");
         } else {
           System.out.print(mapa_de_calor.get(i).get(j) + " ");
         }
@@ -624,13 +617,17 @@ public class Agent extends AbstractPlayer {
       return accion;
 
     } else if (estado == Nivel.RS || estado == Nivel.RC) {
-      ACTIONS accion = ACTIONS.ACTION_USE;
+      mapa_de_calor.clear();
+      crear_mapa_calor(stateObs,elapsedTimer);
+
+      ACTIONS accion = ACTIONS.ACTION_NIL;
 
       avatar = stateObs.getAvatarPosition();
       avatar.x = avatar.x / fescala.x;
       avatar.y = avatar.y / fescala.y;
 
       peligro_actual = mapa_de_calor.get((int) avatar.y).get((int) avatar.x);
+      mejor_peligro = peligro_actual;
 
       System.out.println("Nivel de peligro actual: " + peligro_actual);
       System.out.println("Posicion: " + avatar);
@@ -640,56 +637,62 @@ public class Agent extends AbstractPlayer {
         //if(obv[(int)avatar.y][(int)(avatar.x+1)].size() != 0){
         if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_RIGHT)){
           if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_RIGHT, stateObs)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-            return ACTIONS.ACTION_RIGHT;
+            mejor_peligro = mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1));
+            accion = ACTIONS.ACTION_RIGHT;
           }
         } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_LEFT)){
           if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-            return ACTIONS.ACTION_LEFT;
+            mejor_peligro = mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1));
+            accion = ACTIONS.ACTION_LEFT;
           }
         } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_UP)){
           if(peligro_actual > mapa_de_calor.get((int) avatar.y-1).get((int)(avatar.x)) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-            return ACTIONS.ACTION_UP;
+            mejor_peligro = mapa_de_calor.get((int) avatar.y-1).get((int)(avatar.x));
+            accion = ACTIONS.ACTION_UP;
           }
         } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_DOWN)){
           if(peligro_actual > mapa_de_calor.get((int) avatar.y+1).get((int)(avatar.x)) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-            return ACTIONS.ACTION_DOWN;
+            mejor_peligro = mapa_de_calor.get((int) avatar.y+1).get((int)(avatar.x));
+            accion = ACTIONS.ACTION_DOWN;
           }
         }
 
-        if(peligro_actual >= mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_RIGHT, stateObs)){
+        if(mejor_peligro > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_RIGHT, stateObs)){
+          mejor_peligro = mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1));
           accion = ACTIONS.ACTION_RIGHT;
 
-        } else if(peligro_actual >= mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
+        }
+        if(mejor_peligro > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
+          mejor_peligro = mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1));
           accion = ACTIONS.ACTION_LEFT;
 
-        } else if(peligro_actual >= mapa_de_calor.get((int) (avatar.y+1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
+        }
+        if(mejor_peligro > mapa_de_calor.get((int) (avatar.y+1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
+          mejor_peligro = mapa_de_calor.get((int) avatar.y+1).get((int)(avatar.x));
           accion = ACTIONS.ACTION_DOWN;
 
-        } else if(peligro_actual >= mapa_de_calor.get((int) (avatar.y-1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
+        }
+        if(mejor_peligro > mapa_de_calor.get((int) (avatar.y-1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
+          mejor_peligro = mapa_de_calor.get((int) avatar.y-1).get((int)(avatar.x));
           accion = ACTIONS.ACTION_UP;
 
         }
       } else {
         accion = ACTIONS.ACTION_NIL;
       }
-      mapa_de_calor.clear();
-      crear_mapa_calor(stateObs,elapsedTimer);
+      System.out.println(accion);
       return accion;
 
     } else if(estado == Nivel.RD){
+      mapa_de_calor.clear();
+      crear_mapa_calor(stateObs,elapsedTimer);
+
       ACTIONS accion = ACTIONS.ACTION_NIL;
       avatar = stateObs.getAvatarPosition();
       avatar.x = avatar.x / fescala.x;
       avatar.y = avatar.y / fescala.y;
       peligro_actual = mapa_de_calor.get((int) avatar.y).get((int) avatar.x);
+      mejor_peligro = peligro_actual;
 
       System.out.println("Nivel de peligro actual: " + peligro_actual);
       System.out.println("Posicion: " + avatar);
@@ -699,45 +702,43 @@ public class Agent extends AbstractPlayer {
         interrupcion = true;
         if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_RIGHT)){
           if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_RIGHT, stateObs)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-            return ACTIONS.ACTION_RIGHT;
+            mejor_peligro = mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1));
+            accion = ACTIONS.ACTION_RIGHT;
           }
         } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_LEFT)){
           if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-            return ACTIONS.ACTION_LEFT;
+            mejor_peligro = mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1));
+            accion = ACTIONS.ACTION_LEFT;
           }
         } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_UP)){
           if(peligro_actual > mapa_de_calor.get((int) avatar.y-1).get((int)(avatar.x)) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-            return ACTIONS.ACTION_UP;
+            mejor_peligro = mapa_de_calor.get((int) avatar.y-1).get((int)(avatar.x));
+            accion = ACTIONS.ACTION_UP;
           }
         } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_DOWN)){
           if(peligro_actual > mapa_de_calor.get((int) avatar.y+1).get((int)(avatar.x)) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-            return ACTIONS.ACTION_DOWN;
+            mejor_peligro = mapa_de_calor.get((int) avatar.y+1).get((int)(avatar.x));
+            accion = ACTIONS.ACTION_DOWN;
           }
         }
 
-        if(peligro_actual >= mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_RIGHT, stateObs)){
+        if(mejor_peligro > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_RIGHT, stateObs)){
+          mejor_peligro = mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1));
           accion = ACTIONS.ACTION_RIGHT;
-
-        } else if(peligro_actual >= mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
-          accion = ACTIONS.ACTION_LEFT;
-
-        } else if(peligro_actual >= mapa_de_calor.get((int) (avatar.y+1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
-          accion = ACTIONS.ACTION_DOWN;
-
-        } else if(peligro_actual >= mapa_de_calor.get((int) (avatar.y-1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
-          accion = ACTIONS.ACTION_UP;
-
         }
-        mapa_de_calor.clear();
-        crear_mapa_calor(stateObs,elapsedTimer);
+        if(mejor_peligro > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
+          mejor_peligro = mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1));
+          accion = ACTIONS.ACTION_LEFT;
+        }
+        if(mejor_peligro > mapa_de_calor.get((int) (avatar.y+1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
+          mejor_peligro = mapa_de_calor.get((int) avatar.y+1).get((int)(avatar.x));
+          accion = ACTIONS.ACTION_DOWN;
+        }
+        if(mejor_peligro > mapa_de_calor.get((int) (avatar.y-1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
+          mejor_peligro = mapa_de_calor.get((int) avatar.y-1).get((int)(avatar.x));
+          accion = ACTIONS.ACTION_UP;
+        }
+        System.out.println(accion);
         return accion;
       } else {
 
@@ -782,8 +783,7 @@ public class Agent extends AbstractPlayer {
         accion = ruta.get(0);
         //System.out.println(ruta.get(0));
         ruta.remove(0);
-        mapa_de_calor.clear();
-        crear_mapa_calor(stateObs,elapsedTimer);
+        System.out.println(accion);
         return accion;
       }
     }
