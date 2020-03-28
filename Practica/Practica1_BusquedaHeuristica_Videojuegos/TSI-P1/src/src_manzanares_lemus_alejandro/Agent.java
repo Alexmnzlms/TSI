@@ -20,7 +20,7 @@ enum Nivel{
 }
 
 public class Agent extends AbstractPlayer {
-  private Nivel estado = Nivel.DC;
+  private Nivel estado = Nivel.RD;
 
   private Vector2d fescala;
   private Vector2d portal;
@@ -261,13 +261,6 @@ public class Agent extends AbstractPlayer {
 
     if(actual.getPosicion().x == destino.x && actual.getPosicion().y == destino.y){
       ruta_completa = true;
-    }
-
-    if((obv[(int) actual.getPosicion().x][(int) actual.getPosicion().y]).size() > 0){
-      if((obv[(int) actual.getPosicion().x][(int) actual.getPosicion().y]).get(0).itype == 6){
-        gema_encontrada = true;
-        System.out.println("Gema encontrada");
-      }
     }
 
     if(ruta_completa){
@@ -525,13 +518,13 @@ public class Agent extends AbstractPlayer {
         for (int j = (int)(pos_enemigo.y-3); j <= pos_enemigo.y+3; j++){
           if(i > 0 && i < (int) limites.x && j > 0 && j < (int) limites.y) {
             if(i == (int)(pos_enemigo.x-3) || j == (int)(pos_enemigo.y-3) || i == (int)(pos_enemigo.x+3) || j == (int)(pos_enemigo.y+3)){
-              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+3);
-            }else if(i == (int)(pos_enemigo.x-2) || j == (int)(pos_enemigo.y-2) || i == (int)(pos_enemigo.x+2) || j == (int)(pos_enemigo.y+2)){
               mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+4);
-            } else if (i == (int)pos_enemigo.x && j == (int)(pos_enemigo.y)){
-              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+6);
-            } else {
+            }else if(i == (int)(pos_enemigo.x-2) || j == (int)(pos_enemigo.y-2) || i == (int)(pos_enemigo.x+2) || j == (int)(pos_enemigo.y+2)){
               mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+5);
+            } else if (i == (int)pos_enemigo.x && j == (int)(pos_enemigo.y)){
+              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+7);
+            } else {
+              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+6);
             }
           }
         }
@@ -594,8 +587,19 @@ public class Agent extends AbstractPlayer {
 
     } else if (estado == Nivel.DC){
 
+      avatar = stateObs.getAvatarPosition();
+      avatar.x = avatar.x / fescala.x;
+      avatar.y = avatar.y / fescala.y;
+
+      System.out.println("Gemas recogidas: " + gemas_recogidas);
+      System.out.println("Posicion jugador: " + avatar);
+      System.out.println("Posicion gema: " + gemas.get(gemas_recogidas));
+      if(avatar.x == gemas.get(gemas_recogidas).x && avatar.y == gemas.get(gemas_recogidas).y){
+          gemas_recogidas++;
+          System.out.println("Gema recogida");
+      }
+
       if(!ruta_completa && ruta.size() == 0){
-        System.out.println(gemas_recogidas);
         abiertos.clear();
         cerrados.clear();
         Vector2d pos = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
@@ -604,15 +608,12 @@ public class Agent extends AbstractPlayer {
         abiertos.add(padre);
         if(gemas_recogidas < 10){
           ruta = A_estrella(gemas.get(gemas_recogidas),stateObs,elapsedTimer);
-          if(gema_encontrada){
-            gemas_recogidas++;
-            gema_encontrada = false;
-          }
         } else {
           ruta = A_estrella(portal,stateObs,elapsedTimer);
         }
 
       }
+
       if(ruta_completa && ruta.size() == 0){
         System.out.println("Tiempo de A*: " + tiempo + "ms.");
       }
@@ -739,16 +740,23 @@ public class Agent extends AbstractPlayer {
         crear_mapa_calor(stateObs,elapsedTimer);
         return accion;
       } else {
-        System.out.println("Gemas encontradas: " + gemas_recogidas);
+
+        System.out.println("Gemas recogidas: " + gemas_recogidas);
+        System.out.println("Posicion jugador: " + avatar);
+        System.out.println("Posicion gema: " + gemas.get(gemas_recogidas));
+
         if(interrupcion){
-          if(gemas_recogidas < 10){
-            gemas_recogidas--;
-          }
-          ruta.clear();
-          ruta_completa = false;
           interrupcion = false;
+          ruta_completa = false;
+          ruta.clear();
         }
-        if(!ruta_completa && ruta.size() == 0 && !interrupcion){
+
+        if(avatar.x == gemas.get(gemas_recogidas).x && avatar.y == gemas.get(gemas_recogidas).y){
+          gemas_recogidas++;
+          System.out.println("Gema recogida");
+        }
+
+        if(!ruta_completa && ruta.size() == 0){
           System.out.println(gemas_recogidas);
           abiertos.clear();
           cerrados.clear();
@@ -778,10 +786,7 @@ public class Agent extends AbstractPlayer {
         crear_mapa_calor(stateObs,elapsedTimer);
         return accion;
       }
-
-
     }
-
     return ACTIONS.ACTION_NIL;
   }
 }
