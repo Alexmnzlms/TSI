@@ -20,7 +20,7 @@ enum Nivel{
 }
 
 public class Agent extends AbstractPlayer {
-  private Nivel estado = Nivel.RD;
+  private Nivel estado = Nivel.RS;
 
   private Vector2d fescala;
   private Vector2d portal;
@@ -482,10 +482,10 @@ public class Agent extends AbstractPlayer {
         }
       }
     }
-    mapa_de_calor.get(1).set(1,3);
-    mapa_de_calor.get(1).set((stateObs.getObservationGrid().length - 2),3);
-    mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 2).set(1,3);
-    mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 2).set((stateObs.getObservationGrid().length - 2),3);
+    mapa_de_calor.get(1).set(1,2);
+    mapa_de_calor.get(1).set((stateObs.getObservationGrid().length - 2),2);
+    mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 2).set(1,2);
+    mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 2).set((stateObs.getObservationGrid().length - 2),2);
 
     /*mapa_de_calor.get(2).set(2,2);
     mapa_de_calor.get(2).set((stateObs.getObservationGrid().length - 3),2);
@@ -514,9 +514,9 @@ public class Agent extends AbstractPlayer {
             }else if(i == (int)(pos_enemigo.x-2) || j == (int)(pos_enemigo.y-2) || i == (int)(pos_enemigo.x+2) || j == (int)(pos_enemigo.y+2)){
               mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+2);
             } else if (i == (int)pos_enemigo.x && j == (int)(pos_enemigo.y)){
-              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+6);
-            } else {
               mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+4);
+            } else {
+              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+3);
             }
           }
         }
@@ -653,70 +653,37 @@ public class Agent extends AbstractPlayer {
             return ACTIONS.ACTION_RIGHT;
           }
         } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_LEFT)){
-          if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
+          if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
             mapa_de_calor.clear();
             crear_mapa_calor(stateObs,elapsedTimer);
             return ACTIONS.ACTION_LEFT;
           }
         } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_UP)){
-          if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
+          if(peligro_actual > mapa_de_calor.get((int) avatar.y-1).get((int)(avatar.x)) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
             mapa_de_calor.clear();
             crear_mapa_calor(stateObs,elapsedTimer);
             return ACTIONS.ACTION_UP;
           }
         } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_DOWN)){
-          if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
+          if(peligro_actual > mapa_de_calor.get((int) avatar.y+1).get((int)(avatar.x)) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
             mapa_de_calor.clear();
             crear_mapa_calor(stateObs,elapsedTimer);
             return ACTIONS.ACTION_DOWN;
           }
         }
 
-        if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_RIGHT, stateObs)){
+        if(peligro_actual >= mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_RIGHT, stateObs)){
           accion = ACTIONS.ACTION_RIGHT;
-          if(misma_orientacion_accion(stateObs.getAvatarOrientation(),accion)) {
-            incompletaR = true;
-          }
-        } else if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
+
+        } else if(peligro_actual >= mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
           accion = ACTIONS.ACTION_LEFT;
-          if(misma_orientacion_accion(stateObs.getAvatarOrientation(),accion)){
-            incompletaL = true;
-          }
-        } else if(peligro_actual > mapa_de_calor.get((int) (avatar.y+1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
+
+        } else if(peligro_actual >= mapa_de_calor.get((int) (avatar.y+1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
           accion = ACTIONS.ACTION_DOWN;
-          if(misma_orientacion_accion(stateObs.getAvatarOrientation(),accion)){
-            incompletaD = true;
-          }
-        } else if(peligro_actual > mapa_de_calor.get((int) (avatar.y-1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
+
+        } else if(peligro_actual >= mapa_de_calor.get((int) (avatar.y-1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
           accion = ACTIONS.ACTION_UP;
-          if(misma_orientacion_accion(stateObs.getAvatarOrientation(),accion)){
-            incompletaU = true;
-          }
-        } else {
-          if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_RIGHT)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-            //incompletaR = true;
-            return ACTIONS.ACTION_RIGHT;
-          } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_LEFT)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-            //incompletaL = true;
-            return ACTIONS.ACTION_LEFT;
 
-          } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_UP)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-            //incompletaU = true;
-            return ACTIONS.ACTION_UP;
-
-          } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_DOWN)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-           //incompletaD = true;
-            return ACTIONS.ACTION_DOWN;
-
-          }
         }
       } else {
         mapa_de_calor.clear();
