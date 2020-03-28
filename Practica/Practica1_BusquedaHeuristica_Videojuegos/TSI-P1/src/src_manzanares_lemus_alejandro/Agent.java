@@ -20,7 +20,7 @@ enum Nivel{
 }
 
 public class Agent extends AbstractPlayer {
-  private Nivel estado = Nivel.RD;
+  private Nivel estado = Nivel.DC;
 
   private Vector2d fescala;
   private Vector2d portal;
@@ -474,7 +474,7 @@ public class Agent extends AbstractPlayer {
         }
       }
     }
-    for(int i = 1; i < stateObs.getObservationGrid()[0].length-1; i++){
+    /*for(int i = 1; i < stateObs.getObservationGrid()[0].length-1; i++){
       for(int j = 1; j < stateObs.getObservationGrid().length-1; j++){
         if(i == 1 || i == stateObs.getObservationGrid()[0].length-2){
           mapa_de_calor.get(i).set(j,mapa_de_calor.get(i).get(j)+1);
@@ -482,7 +482,29 @@ public class Agent extends AbstractPlayer {
           mapa_de_calor.get(i).set(j,mapa_de_calor.get(i).get(j)+1);
         }
       }
+    }*/
+
+    for(int i = 0; i < stateObs.getObservationGrid()[0].length; i++){
+      for(int j = 0; j < stateObs.getObservationGrid().length; j++){
+        if(stateObs.getObservationGrid()[j][i].size() > 0){
+          if(stateObs.getObservationGrid()[j][i].get(0).itype == 0){
+            if(j - 1 > 0){
+              mapa_de_calor.get(i).set(j-1,mapa_de_calor.get(i).get(j-1)+1);
+            }
+            if(j + 1 < limites.x){
+              mapa_de_calor.get(i).set(j+1,mapa_de_calor.get(i).get(j+1)+1);
+            }
+            if(i -1 > 0){
+              mapa_de_calor.get(i-1).set(j,mapa_de_calor.get(i-1).get(j)+1);
+            }
+            if(i + 1 < limites.y){
+              mapa_de_calor.get(i+1).set(j,mapa_de_calor.get(i+1).get(j)+1);
+            }
+          }
+        }
+      }
     }
+
     mapa_de_calor.get(1).set(1,2);
     mapa_de_calor.get(1).set((stateObs.getObservationGrid().length - 2),2);
     mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 2).set(1,2);
@@ -719,7 +741,9 @@ public class Agent extends AbstractPlayer {
       } else {
         System.out.println("Gemas encontradas: " + gemas_recogidas);
         if(interrupcion){
-          gemas_recogidas--;
+          if(gemas_recogidas < 10){
+            gemas_recogidas--;
+          }
           ruta.clear();
           ruta_completa = false;
           interrupcion = false;
