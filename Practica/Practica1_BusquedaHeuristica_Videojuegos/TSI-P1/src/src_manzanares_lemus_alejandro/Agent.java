@@ -20,7 +20,7 @@ enum Nivel{
 }
 
 public class Agent extends AbstractPlayer {
-  private Nivel estado = Nivel.RS;
+  private Nivel estado = Nivel.RD;
 
   private Vector2d fescala;
   private Vector2d portal;
@@ -41,10 +41,6 @@ public class Agent extends AbstractPlayer {
   private ArrayList<ArrayList<Integer>> mapa_de_calor = new ArrayList<>();
   private Vector2d avatar;
   private int peligro_actual;
-  private boolean incompletaR;
-  private boolean incompletaL;
-  private boolean incompletaU;
-  private boolean incompletaD;
 
   private boolean interrupcion;
 
@@ -471,6 +467,11 @@ public class Agent extends AbstractPlayer {
       mapa_de_calor.add(new ArrayList<>());
       for(int j = 0; j < stateObs.getObservationGrid().length; j++){
         mapa_de_calor.get(i).add(0);
+        if(stateObs.getObservationGrid()[j][i].size() > 0){
+          if(stateObs.getObservationGrid()[j][i].get(0).itype == 6){
+            mapa_de_calor.get(i).set(j,mapa_de_calor.get(i).get(j)-1);
+          }
+        }
       }
     }
     for(int i = 1; i < stateObs.getObservationGrid()[0].length-1; i++){
@@ -501,22 +502,14 @@ public class Agent extends AbstractPlayer {
       for(int i = (int)(pos_enemigo.x-3); i <= pos_enemigo.x+3; i++){
         for (int j = (int)(pos_enemigo.y-3); j <= pos_enemigo.y+3; j++){
           if(i > 0 && i < (int) limites.x && j > 0 && j < (int) limites.y) {
-            /*if(i == (int)(pos_enemigo.x-7) || j == (int)(pos_enemigo.y-7) || i == (int)(pos_enemigo.x+7) || j == (int)(pos_enemigo.y+7)){
-              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+1);
-            } else if(i == (int)(pos_enemigo.x-6) || j == (int)(pos_enemigo.y-6) || i == (int)(pos_enemigo.x+6) || j == (int)(pos_enemigo.y+6)){
-              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+2);
-            } else if(i == (int)(pos_enemigo.x-5) || j == (int)(pos_enemigo.y-5) || i == (int)(pos_enemigo.x+5) || j == (int)(pos_enemigo.y+5)){
+            if(i == (int)(pos_enemigo.x-3) || j == (int)(pos_enemigo.y-3) || i == (int)(pos_enemigo.x+3) || j == (int)(pos_enemigo.y+3)){
               mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+3);
-            } else if(i == (int)(pos_enemigo.x-4) || j == (int)(pos_enemigo.y-4) || i == (int)(pos_enemigo.x+4) || j == (int)(pos_enemigo.y+4)){
-              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+4);
-            } else */if(i == (int)(pos_enemigo.x-3) || j == (int)(pos_enemigo.y-3) || i == (int)(pos_enemigo.x+3) || j == (int)(pos_enemigo.y+3)){
-              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+1);
             }else if(i == (int)(pos_enemigo.x-2) || j == (int)(pos_enemigo.y-2) || i == (int)(pos_enemigo.x+2) || j == (int)(pos_enemigo.y+2)){
-              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+2);
-            } else if (i == (int)pos_enemigo.x && j == (int)(pos_enemigo.y)){
               mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+4);
+            } else if (i == (int)pos_enemigo.x && j == (int)(pos_enemigo.y)){
+              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+6);
             } else {
-              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+3);
+              mapa_de_calor.get(j).set(i,mapa_de_calor.get(j).get(i)+5);
             }
           }
         }
@@ -620,31 +613,7 @@ public class Agent extends AbstractPlayer {
       System.out.println("Posicion: " + avatar);
       System.out.println("Orientacion: " + stateObs.getAvatarOrientation());
 
-      if(incompletaR){
-        mapa_de_calor.clear();
-        crear_mapa_calor(stateObs,elapsedTimer);
-        incompletaR = false;
-        return ACTIONS.ACTION_RIGHT;
-      } else if(incompletaL){
-        mapa_de_calor.clear();
-        crear_mapa_calor(stateObs,elapsedTimer);
-        incompletaL = false;
-        return ACTIONS.ACTION_LEFT;
-      } else if(incompletaU){
-        mapa_de_calor.clear();
-        crear_mapa_calor(stateObs,elapsedTimer);
-        incompletaU = false;
-        return ACTIONS.ACTION_UP;
-      } else if(incompletaD){
-        mapa_de_calor.clear();
-        crear_mapa_calor(stateObs,elapsedTimer);
-        incompletaD = false;
-        return ACTIONS.ACTION_DOWN;
-      }
-
       if(peligro_actual > 0){
-        System.out.println("TENGO MIEDO EN ESTE MOMENTO");
-        System.out.println("-----------------------------");
         //if(obv[(int)avatar.y][(int)(avatar.x+1)].size() != 0){
         if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_RIGHT)){
           if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_RIGHT, stateObs)){
@@ -686,17 +655,14 @@ public class Agent extends AbstractPlayer {
 
         }
       } else {
-        mapa_de_calor.clear();
-        crear_mapa_calor(stateObs,elapsedTimer);
-        return ACTIONS.ACTION_NIL;
+        accion = ACTIONS.ACTION_NIL;
       }
-
-      //System.out.println(accion);
       mapa_de_calor.clear();
       crear_mapa_calor(stateObs,elapsedTimer);
       return accion;
 
     } else if(estado == Nivel.RD){
+      ACTIONS accion = ACTIONS.ACTION_NIL;
       avatar = stateObs.getAvatarPosition();
       avatar.x = avatar.x / fescala.x;
       avatar.y = avatar.y / fescala.y;
@@ -706,118 +672,59 @@ public class Agent extends AbstractPlayer {
       System.out.println("Posicion: " + avatar);
       System.out.println("Orientacion: " + stateObs.getAvatarOrientation());
 
-      if(peligro_actual > 0){
-        System.out.println("TENGO MIEDO EN ESTE MOMENTO");
-        System.out.println("-----------------------------");
-        //if(obv[(int)avatar.y][(int)(avatar.x+1)].size() != 0){
+      if(peligro_actual > 2){
+        interrupcion = true;
         if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_RIGHT)){
           if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_RIGHT, stateObs)){
             mapa_de_calor.clear();
             crear_mapa_calor(stateObs,elapsedTimer);
-            ruta_completa = false;
-            interrupcion = true;
-            ruta.clear();
             return ACTIONS.ACTION_RIGHT;
           }
         } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_LEFT)){
-          if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
+          if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
             mapa_de_calor.clear();
             crear_mapa_calor(stateObs,elapsedTimer);
-            ruta_completa = false;
-            interrupcion = true;
-            ruta.clear();
             return ACTIONS.ACTION_LEFT;
           }
         } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_UP)){
-          if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
+          if(peligro_actual > mapa_de_calor.get((int) avatar.y-1).get((int)(avatar.x)) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
             mapa_de_calor.clear();
             crear_mapa_calor(stateObs,elapsedTimer);
-            ruta_completa = false;
-            interrupcion = true;
-            ruta.clear();
             return ACTIONS.ACTION_UP;
           }
         } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_DOWN)){
-          if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
+          if(peligro_actual > mapa_de_calor.get((int) avatar.y+1).get((int)(avatar.x)) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
             mapa_de_calor.clear();
             crear_mapa_calor(stateObs,elapsedTimer);
-            ruta_completa = false;
-            interrupcion = true;
-            ruta.clear();
             return ACTIONS.ACTION_DOWN;
           }
         }
 
-        if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_RIGHT, stateObs)){
-          mapa_de_calor.clear();
-          crear_mapa_calor(stateObs,elapsedTimer);
-          ruta_completa = false;
-          interrupcion = true;
-          ruta.clear();
-          return ACTIONS.ACTION_RIGHT;
+        if(peligro_actual >= mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_RIGHT, stateObs)){
+          accion = ACTIONS.ACTION_RIGHT;
 
-        } else if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
-          mapa_de_calor.clear();
-          crear_mapa_calor(stateObs,elapsedTimer);
-          ruta_completa = false;
-          interrupcion = true;
-          ruta.clear();
-          return ACTIONS.ACTION_LEFT;
+        } else if(peligro_actual >= mapa_de_calor.get((int) avatar.y).get((int)(avatar.x-1)) && avatar_en_limite(ACTIONS.ACTION_LEFT, stateObs)){
+          accion = ACTIONS.ACTION_LEFT;
 
-        } else if(peligro_actual > mapa_de_calor.get((int) (avatar.y+1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
-          mapa_de_calor.clear();
-          crear_mapa_calor(stateObs,elapsedTimer);
-          ruta_completa = false;
-          interrupcion = true;
-          ruta.clear();
-          return ACTIONS.ACTION_DOWN;
+        } else if(peligro_actual >= mapa_de_calor.get((int) (avatar.y+1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_DOWN, stateObs)){
+          accion = ACTIONS.ACTION_DOWN;
 
-        } else if(peligro_actual > mapa_de_calor.get((int) (avatar.y-1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
-          mapa_de_calor.clear();
-          crear_mapa_calor(stateObs,elapsedTimer);
-          ruta_completa = false;
-          interrupcion = true;
-          ruta.clear();
-          return ACTIONS.ACTION_UP;
+        } else if(peligro_actual >= mapa_de_calor.get((int) (avatar.y-1)).get((int)avatar.x) && avatar_en_limite(ACTIONS.ACTION_UP, stateObs)){
+          accion = ACTIONS.ACTION_UP;
 
-        } else {
-          if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_RIGHT)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-            ruta_completa = false;
-            interrupcion = true;
-            ruta.clear();
-            return ACTIONS.ACTION_RIGHT;
-          } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_LEFT)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-            ruta_completa = false;
-            interrupcion = true;
-            ruta.clear();
-            return ACTIONS.ACTION_LEFT;
-
-          } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_UP)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-            ruta_completa = false;
-            interrupcion = true;
-            ruta.clear();
-            return ACTIONS.ACTION_UP;
-
-          } else if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_DOWN)){
-            mapa_de_calor.clear();
-            crear_mapa_calor(stateObs,elapsedTimer);
-            ruta_completa = false;
-            interrupcion = true;
-            ruta.clear();
-            return ACTIONS.ACTION_DOWN;
-
-          }
         }
-      } else {
         mapa_de_calor.clear();
         crear_mapa_calor(stateObs,elapsedTimer);
-        if(!ruta_completa && ruta.size() == 0){
+        return accion;
+      } else {
+        System.out.println("Gemas encontradas: " + gemas_recogidas);
+        if(interrupcion){
+          gemas_recogidas--;
+          ruta.clear();
+          ruta_completa = false;
+          interrupcion = false;
+        }
+        if(!ruta_completa && ruta.size() == 0 && !interrupcion){
           System.out.println(gemas_recogidas);
           abiertos.clear();
           cerrados.clear();
@@ -827,10 +734,9 @@ public class Agent extends AbstractPlayer {
           abiertos.add(padre);
           if(gemas_recogidas < 10){
             ruta = A_estrella(gemas.get(gemas_recogidas),stateObs,elapsedTimer);
-            if(gema_encontrada && !interrupcion){
+            if(gema_encontrada){
               gemas_recogidas++;
               gema_encontrada = false;
-              interrupcion = false;
             }
           } else {
             ruta = A_estrella(portal,stateObs,elapsedTimer);
@@ -841,9 +747,11 @@ public class Agent extends AbstractPlayer {
           System.out.println("Tiempo de A*: " + tiempo + "ms.");
         }
 
-        ACTIONS accion = ruta.get(0);
+        accion = ruta.get(0);
         //System.out.println(ruta.get(0));
         ruta.remove(0);
+        mapa_de_calor.clear();
+        crear_mapa_calor(stateObs,elapsedTimer);
         return accion;
       }
 
