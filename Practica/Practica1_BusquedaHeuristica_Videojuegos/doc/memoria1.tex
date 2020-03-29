@@ -1,15 +1,70 @@
 \chapter{Comportamiento Deliberativo}
-\section{Deliberativo simple}
+La resolución del comportamiento deliberativo ---tanto el simple como el compuesto--- se basa en la aplicación del Algoritmo $ A^{*} $. A continuación se muestra un pseudo-código del comportamiento general del algoritmo $ A^{*} $ implementado en esta práctica:
 \begin{minted}
 [fontsize=\footnotesize, linenos]
 {Java}
+A*:
+   Crear nodo padre con la posición y orientación del avatar.
+   Añadir nodo padre a abiertos
 
+   Do:
+      Nodo actual = sacar primer nodo de abiertos
+      Añadir actual a cerrados
+
+      Para todas las acciones disponibles:
+         Calcular la posición del avatar después de aplicar la acción
+         Obtener el tipo de la casilla en la nueva posición
+         Si tipo distinto de 0:
+            Añadir a la lista de acciones del nodo la acción actual
+            Si el nodo no tiene la misma orientación que la acción:
+               Añadir otra vez la acción a la lista del nodo
+            Actualizar la orientación del nodo según la acción actual
+            Crear un nodo con la posición y la orientación actualizadas
+            Comprobar que el nodo hijo no se encuentra en cerrados
+               Si no se encuentra en cerrados comprobar abiertos
+                  Si se encuentra, actualizar el nodo si el coste del camino es inferior
+            Si el nodo no esta ni en cerrados ni en abiertos añadirlo a abiertos
+      Ordenar abiertos
+
+   While: La posición del nodo actual sea distinta al destino y no superemos el tiempo máximo permitido
+
+   Devolver la ruta del nodo actual
 \end{minted}
+\section{Deliberativo simple}
+Para la resolución del nivel 1, simplemente se aplica el algoritmo $ A^{*} $ previamente definido para calcular la ruta entre la posición actual del avatar y la posición del portal. Para la implementación del algoritmo se ha creado la clase Node, que almacena un estado concreto del avatar:
+\begin{itemize}
+   \item La posición del avatar.
+   \item La orientación del avatar.
+   \item La lista de acciones que han llevado al estado actual de orientación y posición.
+   \item La valor del nodo $ f(n) = g(n) + h(n) $
+   \begin{itemize}
+      \item El coste del camino $ g(n) $: Es el número de acciones que han llevado al estado actual.
+      \item El valor heurístico $ h(n) $: La distancia manhattan de la posición del nodo a la posición del portal.
+   \end{itemize}
+\end{itemize}
+
+El coste del camino se calcula, según el número de acciones que haya en la lista de acciones del nodo. La idea es que  cuando se produce un cambio de orientación, $ A^{*} $ introduce dos veces la misma acción en la lista de acciones del nodo, porque son necesarias dos acciones para que el movimiento se haga efectivo (giro + movimiento), así siempre tendra prioridad un camino con el menor numero de giros.\\
+La primera vez que se lanza el algoritmo $ A^{*} $ se hace en el constructor de \textbf{Agent}. Si por cualquier razón, en 1 segundo $ A^{*} $ no fuera capaz de encontrar la ruta óptima al objetivo, devolverá \emph{ACTION\_NIL} y se ejecutará nuevamente en el método \emph{act} de la clase \textbf{Agent}. La idea detrás de esto es limitar que en un mapa de un tamaño considerable o con muchos obstáculos, $ A^{*} $ no pierda mas tiempo del necesario calculando caminos. Las listas de nodos abiertos y cerrados se mantienen entre varias ejecuciones de $ A^{*} $, para que no se exploren continuamente caminos ya explorados. Si $ A^{*} $ no ha llegado al nodo destino en el tiempo disponible, no devuelve la ruta del ultimo nodo calculado, porque este nodo puede pertenecer a una ruta que parezca la óptima, pero que aun no ha sido descartada, para evitar dar vueltas innecesarias primero se calcula la ruta y después se ejecutan las acciones.\\
+\\
+
 \section{Deliberativo compuesto}
+A diferencia del nivel 1, el nivel 2 se basa en recoger un numero determinado de gemas ---10 gemas concretamente--- de la manera más óptima posible y llegar al portal en el menor número de ticks posibles.
+\\
+Para esto se ha implementado una matriz de distancias, en estas se almacenan las distancias entre el avatar y las distintas gemas, asi como la distancia entre todas las combinaciones de gemas. La distancia entre dos puntos se calcula como el numero de pasos necesarios para llegar del punto A al punto B calculados mediante el algoritmo $ A^{*} $. Esta matriz de distancias se calcula aprovechando el tiempo extra que aporta el constructor de la clase \textbf{Agent} y se utiliza una versión modificada de $ A^{*} $ que devuelve el numero de acciones calculadas en vez de la ruta hasta el objetivo.\\
+Para explorar el espacio de soluciones, se ha implementado la case \textbf{Gem}, que se trata simplemente de una version adaptada de la clase \textbf{Node}, que almacena:
+\begin{itemize}
+   \item La combinación actual de gemas.
+   \item El coste de la combinación.
+\end{itemize}
+El espacio se explora con una version adaptada del algoritmo $ A^{*} $. Los primeros nodos a explorar son una combinanción de la posición actual del avatar, y cada una de las posibles gemas. Si se tienen 10 gemas, en la lista de nodos posibles comienzan 10 nodos. Al estar la lista de posibles explorada, se selecciona el nodo que menor coste de combinación tenga. A partir de este nodo se crea un nodo nuevo, añadiendo a la combinación actual, la primera gema disponible ---si la combianción es 0,1 la siguiente gema posible es la gema 2--- y actualizando el coste de la combinación ---en este caso añadiendo la distancia de la gema 1 a la gema 2 que esta almacenada en la matriz de distancias---. Este nodo nuevo se añade a la lista de posibles, y se continuan generando nodos añadiendo a la combinación de gemas las demas posibles gemas. La diferencia está en que estos nodos creados después del primero, solo se añaden a la lista de posibles, si el coste de combinación de estos mejora al coste del primer nodo creado. Asi, una combianción de nodos cuyo valor no mejore, no se continuara explicando y por tanto nos ahorraremos explorar una gran parte del espacio de soluciones. Se ordena la lista de nodos posibles, y añadimos a la lista de explorados el nodo a partir del cual hemos generado los nuevos nodos. Continuamos haciendo esto hasta que obtenemos la primera combianción de 10 gemas ---o del numero de gemas para el que queramos hacer un camino---.\\
+
+Todo este proceso se realiza en el constructor de la clase \textbf{Agent} mientras que en el metodo \emph{act} una vez se ha calculado la secuencia de gemas a recoger, se calcula la ruta entre el avatar y la gema correspondiente mediante $ A^{*} $ y una vez se han recogido todas, se calcula la ruta hasta el portal.
 
 
+\newpage
 \chapter{Comportamiento Reactivo}
 \section{Reactivo simple}
 \section{Reactivo compuesto}
 
+\newpage
 \chapter{Comportamiento Reactivo-Deliberativo}
