@@ -95,14 +95,7 @@ public class Agent extends AbstractPlayer {
       matriz_distancias = new ArrayList<>();
 
       calcular_distancias_gemas(stateObs,elapsedTimer);
-      /*System.out.println("Numero de gemas:" + matriz_distancias.size());
-      for(int i = 0; i < matriz_distancias.size(); i++){
-        for(int j = 0; j < matriz_distancias.size(); j++){
-          System.out.print("["+i+","+j+ "]: " + matriz_distancias.get(i).get(j) + " ");
-        }
-        System.out.println();
-      }
-      System.out.println(gemas);*/
+
     } else if(estado == Nivel.RS || estado == Nivel.RC){
 
       crear_mapa_calor(stateObs,elapsedTimer);
@@ -169,7 +162,6 @@ public class Agent extends AbstractPlayer {
             + stateObs.getAvatarPosition().y/fescala.y + ")"
             + " -> " + "(" + destino.x + "," + destino.y + ")");
 
-    //sort(abiertos);
     do{
       actual = abiertos.get(0);
       cerrados.add(actual);
@@ -262,7 +254,6 @@ public class Agent extends AbstractPlayer {
 
     if(ruta_completa){
       path = new ArrayList<ACTIONS>(actual.getAccion());
-      System.out.println("Camino encontrado");
       ruta_completa = false;
     } else {
       path = new ArrayList<ACTIONS>();
@@ -358,18 +349,11 @@ public class Agent extends AbstractPlayer {
     for(int i = 0; i < g[0].size(); i++){
       gemas.add(new Vector2d(g[0].get(i).position.x / fescala.x ,g[0].get(i).position.y/fescala.x));
     }
-    //gemas.add(new Vector2d(portal.x,portal.y));
-
-    //System.out.println(gemas.size());
 
   }
 
   public void calcular_distancias_gemas(StateObservation stateObs, ElapsedCpuTimer elapsedTimer){
     calcular_posicion_gemas(stateObs,elapsedTimer);
-    /*for(int i = 0; i < gemas.size(); i++){
-      System.out.println("[" + i + "]:" + gemas.get(i));
-    }*/
-
 
     for(int i = 0; i < gemas.size(); i++){
       matriz_distancias.add(new ArrayList<>());
@@ -399,7 +383,6 @@ public class Agent extends AbstractPlayer {
     sort(posibles);
     Gem actual = posibles.get(0);;
     posibles.remove(0);
-    //System.out.println(actual);
 
     while(actual.getGem_size() != 11){
       explorados.add(actual);
@@ -413,7 +396,6 @@ public class Agent extends AbstractPlayer {
           ArrayList<Integer> indices_actual = new ArrayList<>(actual.getGems());
           indices_actual.add(i);
           Gem hijo = new Gem(indices_actual, actual.getPeso()+matriz_distancias.get(actual.getGems().get(actual.getGem_size()-1)).get(i));
-          //System.out.println("Distancia de " + actual.getGems().get(actual.getGem_size()-1) + " a " + i + " = " + matriz_distancias.get(actual.getGems().get(actual.getGem_size()-1)).get(i));
 
           if(primero){
             hijo_mejor = new Gem(hijo);
@@ -433,9 +415,8 @@ public class Agent extends AbstractPlayer {
       sort(posibles);
       actual = posibles.get(0);
       posibles.remove(0);
-      //System.out.println(actual);
     }
-    //System.out.println(actual);
+
 
     ArrayList<Vector2d> gemas_def = new ArrayList<>();
 
@@ -459,15 +440,6 @@ public class Agent extends AbstractPlayer {
         mapa_de_calor.get(i).add(0);
       }
     }
-    /*for(int i = 1; i < stateObs.getObservationGrid()[0].length-1; i++){
-      for(int j = 1; j < stateObs.getObservationGrid().length-1; j++){
-        if(i == 1 || i == stateObs.getObservationGrid()[0].length-2){
-          mapa_de_calor.get(i).set(j,mapa_de_calor.get(i).get(j)+1);
-        } else if(j == 1 || j == stateObs.getObservationGrid().length-2){
-          mapa_de_calor.get(i).set(j,mapa_de_calor.get(i).get(j)+1);
-        }
-      }
-    }*/
 
     for(int i = 0; i < stateObs.getObservationGrid()[0].length; i++){
       for(int j = 0; j < stateObs.getObservationGrid().length; j++){
@@ -491,17 +463,6 @@ public class Agent extends AbstractPlayer {
       }
     }
 
-    /*mapa_de_calor.get(1).set(1,2);
-    mapa_de_calor.get(1).set((stateObs.getObservationGrid().length - 2),2);
-    mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 2).set(1,2);
-    mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 2).set((stateObs.getObservationGrid().length - 2),2);*/
-
-    /*mapa_de_calor.get(2).set(2,2);
-    mapa_de_calor.get(2).set((stateObs.getObservationGrid().length - 3),2);
-    mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 3).set(2,2);
-    mapa_de_calor.get(stateObs.getObservationGrid()[0].length - 3).set((stateObs.getObservationGrid().length - 3),2);*/
-
-
     for(int e = 0; e < enemigos[0].size(); e++){
       Vector2d pos_enemigo = enemigos[0].get(e).position;
       pos_enemigo.x = pos_enemigo.x / fescala.x;
@@ -523,18 +484,6 @@ public class Agent extends AbstractPlayer {
         }
       }
     }
-
-    for(int i = 0; i < mapa_de_calor.size(); i++){
-      for(int j = 0; j < mapa_de_calor.get(0).size(); j++){
-        if( j == (int)(stateObs.getAvatarPosition().x/fescala.x) && i == (int)(stateObs.getAvatarPosition().y/fescala.y)){
-          System.out.print("A"+ mapa_de_calor.get(i).get(j) + " ");
-        } else {
-          System.out.print(mapa_de_calor.get(i).get(j) + " ");
-        }
-      }
-      System.out.println();
-    }
-
   }
 
   public boolean avatar_en_limite(ACTIONS accion,StateObservation stateObs){
@@ -584,12 +533,8 @@ public class Agent extends AbstractPlayer {
       avatar.x = avatar.x / fescala.x;
       avatar.y = avatar.y / fescala.y;
 
-      System.out.println("Gemas recogidas: " + gemas_recogidas);
-      System.out.println("Posicion jugador: " + avatar);
-      System.out.println("Posicion gema: " + gemas.get(gemas_recogidas));
       if(avatar.x == gemas.get(gemas_recogidas).x && avatar.y == gemas.get(gemas_recogidas).y){
           gemas_recogidas++;
-          System.out.println("Gema recogida");
       }
 
       if(!ruta_completa && ruta.size() == 0){
@@ -607,12 +552,9 @@ public class Agent extends AbstractPlayer {
 
       }
 
-      if(ruta_completa && ruta.size() == 0){
-        System.out.println("Tiempo de A*: " + tiempo + "ms.");
-      }
 
       ACTIONS accion = ruta.get(0);
-      //System.out.println(ruta.get(0));
+      System.out.println(accion);
       ruta.remove(0);
       return accion;
 
@@ -629,12 +571,8 @@ public class Agent extends AbstractPlayer {
       peligro_actual = mapa_de_calor.get((int) avatar.y).get((int) avatar.x);
       mejor_peligro = peligro_actual;
 
-      System.out.println("Nivel de peligro actual: " + peligro_actual);
-      System.out.println("Posicion: " + avatar);
-      System.out.println("Orientacion: " + stateObs.getAvatarOrientation());
-
       if(peligro_actual > 0){
-        //if(obv[(int)avatar.y][(int)(avatar.x+1)].size() != 0){
+
         if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_RIGHT)){
           if(peligro_actual > mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1)) && avatar_en_limite(ACTIONS.ACTION_RIGHT, stateObs)){
             mejor_peligro = mapa_de_calor.get((int) avatar.y).get((int)(avatar.x+1));
@@ -694,10 +632,6 @@ public class Agent extends AbstractPlayer {
       peligro_actual = mapa_de_calor.get((int) avatar.y).get((int) avatar.x);
       mejor_peligro = peligro_actual;
 
-      System.out.println("Nivel de peligro actual: " + peligro_actual);
-      System.out.println("Posicion: " + avatar);
-      System.out.println("Orientacion: " + stateObs.getAvatarOrientation());
-
       if(peligro_actual > 2){
         interrupcion = true;
         if(misma_orientacion_accion(stateObs.getAvatarOrientation(),ACTIONS.ACTION_RIGHT)){
@@ -742,10 +676,6 @@ public class Agent extends AbstractPlayer {
         return accion;
       } else {
 
-        System.out.println("Gemas recogidas: " + gemas_recogidas);
-        System.out.println("Posicion jugador: " + avatar);
-        System.out.println("Posicion gema: " + gemas.get(gemas_recogidas));
-
         if(interrupcion){
           interrupcion = false;
           ruta_completa = false;
@@ -754,11 +684,9 @@ public class Agent extends AbstractPlayer {
 
         if(avatar.x == gemas.get(gemas_recogidas).x && avatar.y == gemas.get(gemas_recogidas).y){
           gemas_recogidas++;
-          System.out.println("Gema recogida");
         }
 
         if(!ruta_completa && ruta.size() == 0){
-          System.out.println(gemas_recogidas);
           abiertos.clear();
           cerrados.clear();
           Vector2d pos = new Vector2d(stateObs.getAvatarPosition().x / fescala.x, stateObs.getAvatarPosition().y / fescala.y);
@@ -776,12 +704,8 @@ public class Agent extends AbstractPlayer {
           }
 
         }
-        if(ruta_completa && ruta.size() == 0){
-          System.out.println("Tiempo de A*: " + tiempo + "ms.");
-        }
 
         accion = ruta.get(0);
-        //System.out.println(ruta.get(0));
         ruta.remove(0);
         System.out.println(accion);
         return accion;
