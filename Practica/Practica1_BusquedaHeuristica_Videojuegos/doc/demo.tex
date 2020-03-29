@@ -2,41 +2,31 @@
 
 % Language and input encoding
 
-\usepackage[english]{babel}
+\usepackage[spanish]{babel}
 \usepackage[utf8]{inputenc}
 
 % Document settings
 
 \usepackage{titling}
-	\author{Groctel}
-	\title{Aqademia}
-	\date{\today}
+	\author{Alejandro Manzanares Lemus - Grupo 1}
+	\title{Desarrollo de un agente basado en búsqueda
+heurística para el entorno GVGAI}
+	\date{Marzo 29, 2020}
 
 \usepackage{hologo}
 \usepackage[title=\thetitle]{aqademia}
+\usepackage{minted}
 
 % Document composition
 
 \begin{document}
 
-\aqtitlepage{University of GitHub}
-            {A \hologo{XeTeX} template}
-            {https://github.com/Groctel/aqademia}
+\aqtitlepage[nolicense]
+				{Técnicas de los Sistemas Inteligentes}
+            {}
+            {alexmnzlms@correo.ugr.es}
 \tableofcontents
 
-% Document files
-
-\chapter{Getting to know Aqademia}
-
-\input{input/intro.tex}
-\input{input/dependencies.tex}
-\input{input/building.tex}     \pagebreak
-\input{input/properties.tex}
-
-% Appendices formatting and files
-
-\aqapp{Appendix~}%
-
-\input{input/appendix.tex}
+\input{memoria1.tex}
 
 \end{document}
