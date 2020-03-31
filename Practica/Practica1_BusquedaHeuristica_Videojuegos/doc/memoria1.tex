@@ -5,94 +5,102 @@ La resolución del comportamiento deliberativo ---tanto el simple como el compue
 {Java}
 A*:
    Crear nodo padre con la posición y orientación del avatar.
-   Añadir nodo padre a abiertos
+   Añadir nodo padre a la lista de abiertos
 
    Do:
-      Nodo actual = sacar primer nodo de abiertos
+      Nodo actual = sacar primer nodo de la lista de abiertos
       Añadir actual a cerrados
 
       Para todas las acciones disponibles:
          Calcular la posición del avatar después de aplicar la acción
          Obtener el tipo de la casilla en la nueva posición
          Si tipo distinto de 0:
-            Añadir a la lista de acciones del nodo la acción actual
-            Si el nodo no tiene la misma orientación que la acción:
+            Añadir a la lista de acciones del nodo la acción realizada
+            Si el nodo no tiene la orientación correspondiente a la acción:
                Añadir otra vez la acción a la lista del nodo
-            Actualizar la orientación del nodo según la acción actual
+            Actualizar la orientación del nodo según la acción realizada
             Crear un nodo con la posición y la orientación actualizadas
-            Comprobar que el nodo hijo no se encuentra en cerrados
-               Si no se encuentra en cerrados comprobar abiertos
+            Comprobar que el nodo creado no se encuentra en la lista de cerrados
+               Si no se encuentra en la lista de cerrados comprobar en la de abiertos
                   Si se encuentra, actualizar el nodo si el coste del camino es inferior
-            Si el nodo no esta ni en cerrados ni en abiertos añadirlo a abiertos
-      Ordenar abiertos
+            Si el nodo no esta ni en la lista de cerrados ni en la de abiertos añadirlo a la de abiertos
+      Ordenar la lista de abiertos segun el valor del nodo
 
    While: La posición del nodo actual sea distinta al destino y no superemos el tiempo máximo permitido
 
    Devolver la ruta del nodo actual
 \end{minted}
 \section{Deliberativo simple}
-Para la resolución del nivel 1, simplemente se aplica el algoritmo $ A^{*} $ previamente definido para calcular la ruta entre la posición actual del avatar y la posición del portal. Para la implementación del algoritmo se ha creado la clase Node, que almacena un estado concreto del avatar:
+Para la resolución del nivel 1, simplemente se aplica el algoritmo $ A^{*} $ previamente explicado para calcular la ruta entre la posición actual del avatar y la posición del portal. \\
+Para la implementación del algoritmo se ha creado la clase Node, que almacena un las variables que definen un estado concreto del avatar:
 \begin{itemize}
-   \item La posición del avatar.
-   \item La orientación del avatar.
+   \item La posición.
+   \item La orientación.
    \item La lista de acciones que han llevado al estado actual de orientación y posición.
    \item La valor del nodo $ f(n) = g(n) + h(n) $
    \begin{itemize}
       \item El coste del camino $ g(n) $: Es el número de acciones que han llevado al estado actual.
-      \item El valor heurístico $ h(n) $: La distancia manhattan de la posición del nodo a la posición del portal.
+      \item El valor heurístico $ h(n) $: La distancia manhattan de la posición que almacena el nodo a la posición del portal.
    \end{itemize}
 \end{itemize}
 
-El coste del camino se calcula, según el número de acciones que haya en la lista de acciones del nodo. La idea es que  cuando se produce un cambio de orientación, $ A^{*} $ introduce dos veces la misma acción en la lista de acciones del nodo, porque son necesarias dos acciones para que el movimiento se haga efectivo (giro + movimiento), así siempre tendrá prioridad un camino con el menor numero de giros.\\
-La primera vez que se lanza el algoritmo $ A^{*} $ se hace en el constructor de \textbf{Agent}. Si por cualquier razón, en 1 segundo $ A^{*} $ no fuera capaz de encontrar la ruta óptima al objetivo, devolverá \emph{ACTION\_NIL} y se ejecutará nuevamente en el método \emph{act} de la clase \textbf{Agent}. La idea detrás de esto es limitar que en un mapa de un tamaño considerable o con muchos obstáculos, $ A^{*} $ no pierda mas tiempo del necesario calculando caminos. Las listas de nodos abiertos y cerrados se mantienen entre varias ejecuciones de $ A^{*} $, para que no se exploren continuamente caminos ya explorados. Si $ A^{*} $ no ha llegado al nodo destino en el tiempo disponible, no devuelve la ruta del ultimo nodo calculado, porque este nodo puede pertenecer a una ruta que parezca la óptima, pero que aun no ha sido descartada, para evitar dar vueltas innecesarias primero se calcula la ruta y después se ejecutan las acciones.\\
+El coste del camino se calcula según el número de acciones presentes en la lista de acciones del nodo.\\
+Para reflejar el mayor coste que supone realizar un giro respecto a continuar en la dirección hacia la que mira el avatar, cada vez que se genera un nodo correspondiente a realizar una acción, se comprueba que la orientación del nodo corresponda a la orientación que deberia tener al haber realizado la acción.
+Si esto no sucede, se actualiza la orientación del nodo generado y se añade la acción duplicada en la lista de acciones del nodo. De manera que por cada nodo, solo es posible generar 4 nodos distintos, segun la acción que se escoja realizar.\\
+La primera vez que se lanza el algoritmo $ A^{*} $ se hace en el constructor de \textbf{Agent}. Si por cualquier razón, en 1 segundo $ A^{*} $ no fuera capaz de encontrar la ruta óptima al objetivo, devolverá \emph{ACTION\_NIL} y se ejecutará nuevamente en el método \emph{act} de la clase \textbf{Agent}. La idea detrás de esto es limitar que en un mapa de un tamaño considerable o con muchos obstáculos, $ A^{*} $ no pierda mas tiempo del necesario calculando caminos. Las listas de nodos abiertos y cerrados se mantienen entre varias ejecuciones de $ A^{*} $, para que no se exploren continuamente caminos ya generados. Si $ A^{*} $ no ha llegado al nodo destino en el tiempo disponible, no devuelve la ruta al último nodo calculado, porque este nodo puede pertenecer a una ruta que parezca la óptima, pero que aún no ha sido descartada, para evitar dar vueltas innecesarias primero se calcula la ruta y después se ejecutan las acciones.\\
 \\
 
 \section{Deliberativo compuesto}
-A diferencia del nivel 1, el nivel 2 se basa en recoger un numero determinado de gemas ---10 gemas concretamente--- de la manera más óptima posible y llegar al portal en el menor número de ticks posibles.
+A diferencia del nivel 1, el nivel 2 se basa en recoger un numero determinado de gemas ---10 gemas concretamente--- de la manera más óptima posible y llegar al portal transcurriendo el menor número de ticks.
 \\
-Para esto se ha implementado una matriz de distancias, en estas se almacenan las distancias entre el avatar y las distintas gemas, así como la distancia entre todas las combinaciones de gemas. La distancia entre dos puntos se calcula como el numero de pasos necesarios para llegar del punto A al punto B calculados mediante el algoritmo $ A^{*} $. Esta matriz de distancias se calcula aprovechando el tiempo extra que aporta el constructor de la clase \textbf{Agent} y se utiliza una versión modificada de $ A^{*} $ que devuelve el numero de acciones calculadas en vez de la ruta hasta el objetivo.\\
-Para explorar el espacio de soluciones, se ha implementado la case \textbf{Gem}, que se trata simplemente de una version adaptada de la clase \textbf{Node}, que almacena:
+Para esto se ha implementado una \textbf{matriz de distancias}. En esta se almacenan las distancias entre la posicion inicial del avatar y las distintas gemas, así como la distancia entre todas las gemas. La distancia entre dos puntos se calcula como el numero de pasos necesarios para llegar del punto A al punto B calculados mediante el algoritmo $ A^{*} $. Esta matriz de distancias se calcula aprovechando el tiempo extra que aporta el constructor de la clase \textbf{Agent} y se utiliza una versión modificada de $ A^{*} $ que devuelve el numero de acciones calculadas en lugar de la ruta hasta el objetivo.\\
+Para explorar el espacio de soluciones, se ha implementado la clase \textbf{Gem}, que se trata simplemente de una version adaptada de la clase \textbf{Node}, que almacena:
 \begin{itemize}
-   \item La combinación actual de gemas.
-   \item El coste de la combinación.
+   \item La combinación actual de gemas. Esto es un camino a seguir para recoger las gemas, por ejemplo: (0,2,4,3) , siendo el 0 la posición del avatar y 2, 3 y 4 gemas.
+   \item El coste de la combinación. Siguendo el mismo ejemplo: la distancia (0,2) más la distancia (2,4) más la distancia (4,3).
 \end{itemize}
-El espacio se explora con una version adaptada del algoritmo $ A^{*} $. Los primeros nodos a explorar son una combinación de la posición actual del avatar, y cada una de las posibles gemas. Si se tienen 10 gemas, en la lista de nodos posibles comienzan 10 nodos. Al estar la lista de posibles ordenada, se selecciona el nodo que menor coste de combinación tenga (el primero). A partir de este nodo se crea un nodo nuevo, añadiendo a la combinación actual, la primera gema disponible ---si la combinación es 0,1 la siguiente gema posible es la gema 2--- y actualizando el coste de la combinación ---en este caso añadiendo la distancia de la gema 1 a la gema 2 que esta almacenada en la matriz de distancias---. Este nodo nuevo se añade a la lista de posibles, y se continúan generando nodos añadiendo a la combinación de gemas las demás posibles gemas. La diferencia está en que estos nodos creados después del primero, solo se añaden a la lista de posibles, si el coste de combinación de estos mejora al coste del primer nodo creado. Así, una combinación de nodos cuyo valor no mejore, no se continuara explorando y por tanto nos ahorraremos explorar una gran parte del espacio de soluciones. Se ordena la lista de nodos posibles, y añadimos a la lista de explorados el nodo a partir del cual hemos generado los nuevos nodos. Continuamos haciendo esto hasta que obtenemos la primera combinación de 10 gemas ---o del numero de gemas para el que queramos hacer un camino---.\\
+El espacio se explora con una version adaptada del algoritmo $ A^{*} $. Los primeros nodos a explorar son una combinación de la posición inicial del avatar, y cada una de las posibles gemas. Si se tienen 10 gemas, en la lista de nodos posibles comienzan 10 nodos (La combinación de 0 y cada una de las gemas). Al estar la lista de posibles ordenada, se selecciona el nodo que menor coste de combinación tenga (el primero). A partir de este nodo se crea un nodo nuevo, añadiendo a la combinación actual, la primera gema disponible y actualizando el coste de la combinación  ---si la combinación es (0,1) la siguiente gema posible es la gema 2, por tanto la nueva combinación seria (0,1,2) y al coste de combinación habria que añadir la distancia (1,2)---. Este nuevo nodo se añade a la lista de posibles, y se continúan generando nodos añadiendo a la combinación actual las demás posibles gemas. Si una combinación es (0,3,5), las posibles gemas a añadir son: 2, 4, 5, 7, 8, 9 y 10\\
 
-Todo este proceso se realiza en el constructor de la clase \textbf{Agent} mientras que en el método \emph{act} una vez se ha calculado la secuencia de gemas a recoger, se calcula la ruta entre el avatar y la gema correspondiente mediante $ A^{*} $ y una vez se han recogido todas, se calcula la ruta hasta el portal.
+La diferencia con el algoritmo $ A^{*} $ radica en que, a la hora de generar los hijos de un nodo, solo se genera un hijo. Este hijo se toma como el mejor hijo generado y se añade a la lista de nodos posibles. Solo se añaden más hijos, si el coste de combinación de estos mejora al coste de combinación del mejor hijo generado. Así, una combinación de nodos cuyo valor no mejore, no se continuará explorando y por tanto nos ahorraremos explorar una gran parte del espacio de soluciones. Se ordena la lista de nodos posibles, y añadimos a la lista de explorados el nodo a partir del cual hemos generado los nuevos nodos. Continuamos haciendo esto hasta que obtenemos la primera combinación de 10 gemas ---o del numero de gemas para el que queramos encontrar un camino---.\\
+
+Todo este proceso se realiza en el constructor de la clase \textbf{Agent} mientras que en el método \emph{act} una vez se ha calculado la secuencia de gemas a recoger, se calcula la ruta entre el avatar y la gema correspondiente mediante $ A^{*} $ y una vez se han recogido todas las gemas, se calcula la ruta hasta el portal.
 
 
 \newpage
 \chapter{Comportamiento Reactivo}
-Los niveles 3 y 4 implementan básicamente el mismo comportamiento pero adaptado a un numero variable de enemigos.\\
+Los niveles 3 y 4 implementan básicamente el mismo comportamiento pero adaptado a un solo enemigo ---reactivo simple--- o a un  número variable de estos ---reactivo compuesto---.\\
 
-Para modelar el comportamiento reactivo se utiliza el concepto de mapa de calor.\\
-Se crea una matriz con las dimensiones del mundo y esta se rellena inicialmente de 0's.\\
-Lo primero que se hace es identificar los muros, y actualizar el valor de las casillas donde haya muros a un valor de 9, ya que es una casilla a la que nunca debemos querer movernos, puesto que es imposible. Siempre que no se salga del mapa, las casillas superior, inferior, derecha e izquierda, aumentan en 1 su valor de peligro, puesto que nunca querremos quedarnos acorralados en un muro contra un enemigo. De este modo, las esquinas obtendrán un valor de 2 o 3 dependiendo de lo cerradas que estas sean, haciendo así, que el avatar nunca intente moverse en dirección a una esquina o a un pasillo cerrado si existiera.\\
-A continuación, se obtiene las posiciones de los enemigos, y para estos se realiza el siguiente procedimiento: \\
-En un rango de $\pm 4$ casillas tanto en la coordenada x, como en la coordenada y, se crea un área de peligro alrededor del enemigo, a la casilla donde se encuentra el enemigo se le suma 8 en su valor de peligro, al cuadrado formado por las casillas a uno de distancia (esquinas incluidas), se le suma un valor de 7, a las de distancia 2 un valor de 6 y a las de distancia 4 un valor de 5. Creando así un área de 5x5 alrededor de cada enemigo.\\
+Para modelar el comportamiento reactivo se utiliza el concepto de \textbf{mapa de calor}.\\
+Se crea una matriz con el numero de filas y columnas que posea el mapa e inicialmente se rellena de 0's.\\
+Lo primero que se hace es recorrer la matriz de observación, identificando los muros, y actualizando el valor del mapa de calor correspondiente a la posición de los muros. A una casilla en la que se encuentre un muro, se le asignará un valor de 9, puesto que es una casilla a la que nunca deberemos preferir movernos, ya que es imposible. Siempre que no se superen las dimensiones del mapa, las casillas superior, inferior, derecha e izquierda de un muro, aumentarán en 1 su valor de peligro, puesto que nunca querremos quedarnos acorralados cerca de un muro contra un enemigo. De este modo, las esquinas obtendrán un valor de 2 o 3 dependiendo de lo cerradas que estas sean, haciendo así que el avatar nunca intente moverse en dirección a una esquina o a un pasillo estrecho ---si este existiera---.\\
 
-Una vez terminado esto, obtendremos un mapa de calor, con el valor de peligro de cada casilla y a partir del cual aplicaremos el siguiente comportamiento reactivo:
+A continuación, se obtienen las posiciones de los enemigos, y para cada uno se realiza el siguiente procedimiento: \\
+En un rango de $\pm 4$ casillas tanto en la coordenada x, como en la coordenada y, se crea un área de peligro alrededor del enemigo. A la casilla donde se encuentra el enemigo se le suma 8 a su valor de peligro, al cuadrado formado por las casillas a uno de distancia (esquinas incluidas) se le suma un valor de 7, a las de distancia 2 un valor de 6 y a las de distancia 4 un valor de 5. Creando así un área de peligro de 5x5 alrededor de cada enemigo.\\
+
+Una vez terminado esto, obtendremos un \textbf{mapa de calor}, con el valor de peligro de cada casilla y a partir del cual aplicaremos el siguiente comportamiento reactivo:
 \begin{itemize}
-   \item Calcular el mapa de calor actual
+   \item Calcular el mapa de calor actual.
    \item El nivel de peligro actual es el nivel del peligro de la casilla en la que se encuentra en avatar.
-   \item Obtener el valor de peligro para la casilla que este delante en la orientación que posea el avatar, y ese sera de momento el mejor valor de peligro.
-   \item Comprobar que no haya una casilla alrededor de la posición del jugador que mejore este valor de peligro, si lo hay, quedarse con esta casilla y devolver la acción necesaria para girarse hacia ella.
+   \item Obtener el valor de peligro para la casilla que este delante en la orientación que posea el avatar. Este sera de momento el mejor valor de peligro.
+   \item Comprobar que no haya una casilla alrededor de la posición del avatar que mejore este valor de peligro, si lo hay, quedarse con esta casilla y devolver la acción necesaria para girarse hacia ella.
    \item Si no se ha mejorado el valor de peligro, devolver la acción que corresponda a la orientación del avatar.
-   \item Si el nivel de peligro actual es 0, devolver \emph{ACTION\_NIL}
+   \item Si el nivel de peligro actual es 0 (el umbral de peligro), devolver \emph{ACTION\_NIL}
 \end{itemize}
 
-De esta manera el avatar, intentara moverse siempre hacia las casillas que menos valor de peligro tengan, priorizando las que se encuentren delante de el ---según la orientación que tenga---. Esto es porque es preferible que el avatar se mueva si puede alejarse del peligro, a que se quede quito girando, exponiéndose a ser alcanzado por el enemigo.
+De esta manera, el avatar intentará moverse siempre hacia las casillas que menor valor de peligro tengan, priorizando las que se encuentren delante de él ---según la orientación que tenga---. Esto es porque es preferible que el avatar se mueva si puede alejarse del peligro a que se quede quieto girando, exponiéndose a ser alcanzado por un enemigo.
 
 \newpage
 \chapter{Comportamiento Reactivo-Deliberativo}
 
 Finalmente, el nivel 5, es una combinación de los conceptos explicados en el comportamiento deliberativo compuesto y el comportamiento reactivo.\\
-
-Para este comportamiento es necesario calcular las distancias entre las gemas y obtener un camino optimo para recoger las mismas, así como calcular el mapa de calor correspondiente a cada momento.\\
-
+Para superar este nivel es obtener un camino óptimo para recoger las mismas y llegar al portal, evitando en todo momento ser alcanzado por un enemigo. Para lograr esto se implementa tanto la técnica de la \textbf{matriz de distancias} entre gemas para obtener un camino óptimo de recogida, como la técnica del \textbf{mapa de calor} para conseguir esquivar a los enemigos.\\
 El calculo de la matriz de distancias se realiza una única vez en el constructor de la clase \textbf{Agent}, mientras que el mapa de calor se calcula en cada ejecución del método \emph{act}.\\
 
-En este nivel se ha subido el umbral de peligro a 3. Igual que en los niveles 3 y 4, al no haber peligro ---el peligro actual es igual a 0--- se devuelve la acción \emph{ACTION\_NIL} , en este nivel, siempre que el nivel de peligro actual no supere el valor 2, se aplicara el comportamiento deliberativo compuesto y cuando se supere este umbral, se pasa al comportamiento reactivo.\\
+Dependiendo de si se supera o no el umbral de peligro establecido, se aplicará un comportamiento reactivo o un comportamiento deliberativo. En este caso, el umbral de peligro se ha fijado a un valor de 3. Si el peligro actual no supera este valor, el agente se mueve siguendo la ruta de recogida de gemas, pero si este valor es superado, el agente abandona la ruta y pasa a evitar al peligro hasta que este se aleje y el valor de peligro disminuya de nuevo. El umbral es 3 debido a que para poder recoger gemas eficientemente es necesario arriesgarse a pasar cerca de esquinas y muros siempre y cuando el enemigo no se encuentre lo suficientemente cerca para poder acorralar al avatar. Si el valor de peligro aumenta por encima de 2, significa que estamos dentro del área de peligro de 5x5 de un enemigo y por tanto, debemos dar prioridad a escapar. Si no, el enemigo no esta cerca y debemos centrarnos en recoger gemas y alcanzar el portal.
 
 El comportamiento se implementa de la siguiente manera:\\
-Mientras el nivel de peligro sea menor que 3, se ejecutara el algoritmo $ A^{*} $ para calcular la ruta al objetivo actual, sea este una gema o el portal. Si el nivel de peligro sube por encima de 2, se pasa a reaccionar a los enemigos de la forma que se describe en el apartado de comportamiento reactivo. Una vez el nivel de peligro actual baja de nuevo, es necesario re-calcular la ruta al objetivo actual, puesto que nos habremos movido en el proceso de esquivar al enemigo. Se lanza $ A^{*} $ otra vez para calcular la ruta al objetivo, y si este es una gema, solo se considera que ha sido recogida, cuando el avatar llega a la posición en la que se encuentra la gema. Si no, podría suceder que se quedaran gemas sin recoger aunque la ruta hacia ellas se haya calculado correctamente.
+Primeramente, se ha calculado el camino óptimo a seguir para la recogida de gemas, por tanto, se traza la ruta desde el avatar hasta la primera gema utilizando el algoritmo $ A^{*} $. En cada paso se recalcula el mapa de calor y se comprueba que el valor de peligro no supere el umbral y se continua siguiendo la ruta.\\
+Una vez que el valor de peligro actual supere al umbral, la ruta hacia el objetivo actual (gema o portal) se borra y se pasa a esquivar al enemigo aplicando el criterio de moverse hacia la casilla de mínimo peligro alcanzable, descrito en el apartado de comportamiento reactivo.\\
+Cuando por fin, el valor de peligro decae por debajo del umbral, se recalcula ---utilizando el algoritmo $ A^{*} $--- la ruta hacia el objetivo actual, esta vez desde la posición en la que se encuentra el avatar después de haber esquivado un enemigo. No se puede usar la ruta calculada previamente porque el origen ha cambiado, aunque el destino se mantenga.\\
+
+Este ciclo se repite hasta que se ha obtenido el número deseado de gemas y se ha llegado al portal sin haber sido alcanzado por un enemigo.
