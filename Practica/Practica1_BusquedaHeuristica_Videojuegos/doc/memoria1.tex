@@ -104,3 +104,27 @@ Una vez que el valor de peligro actual supere al umbral, la ruta hacia el objeti
 Cuando por fin, el valor de peligro decae por debajo del umbral, se recalcula ---utilizando el algoritmo $ A^{*} $--- la ruta hacia el objetivo actual, esta vez desde la posición en la que se encuentra el avatar después de haber esquivado un enemigo. No se puede usar la ruta calculada previamente porque el origen ha cambiado, aunque el destino se mantenga.\\
 
 Este ciclo se repite hasta que se ha obtenido el número deseado de gemas y se ha llegado al portal sin haber sido alcanzado por un enemigo.
+
+\chapter{Apéndice}
+\section{Cambiar entre comportamientos}
+A continuación explico cómo cambiar entre los distintos comportamientos:\\
+\begin{minted}
+[fontsize=\footnotesize, linenos]
+{Java}
+enum Nivel{
+  DS, DC, RS, RC, RD
+}
+
+public class Agent extends AbstractPlayer {
+  private Nivel estado = Nivel.X;
+\end{minted}
+
+Este es un extracto del archivo \textbf{Agent.java}.\\
+Para cambiar de comportamiento simplemente hay que sustituir Nivel.X por el elemento del enum \emph{Nivel} que corresponda al comportamiento deseado:
+\begin{itemize}
+   \item \textbf{Nivel.DS}: Comportamiento Deliberativo Simple
+   \item \textbf{Nivel.DC}: Comportamiento Deliberativo Compuesto
+   \item \textbf{Nivel.RS}: Comportamiento Reactivo Simple
+   \item \textbf{Nivel.RC}: Comportamiento Reactivo Compuesto
+   \item \textbf{Nivel.RD}: Comportamiento Reactivo Deliberativo
+\end{itemize}
