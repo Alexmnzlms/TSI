@@ -13,11 +13,17 @@ array[HORA] of string: strHorario = ["9:00h - 10:00h", "10:00h - 11:00h", "11:00
 % 2. Definición de restricciones:
 
 constraint alldifferent(horario);
+% Restricciones del profesor 1
 constraint forall(i in HORA)(if (horario[i] == 1) then (i >= 3) /\ (i <= 6) endif);
+% Restricciones del profesor 2
 constraint forall(i in HORA)(if (horario[i] == 2) then (i >= 3) /\ (i < 5) endif);
+% Restricciones del profesor 3
 constraint forall(i in HORA)(if (horario[i] == 3) then (i >= 2) /\ (i < 6) endif);
+% Restricciones del profesor 4
 constraint forall(i in HORA)(if (horario[i] == 4) then (i >= 2) /\ (i < 5) endif);
+% Restricciones del profesor 5
 constraint forall(i in HORA)(if (horario[i] == 5) then (i >= 3) /\ (i < 5) endif);
+% Restricciones del profesor 6
 constraint forall(i in HORA)(if (horario[i] == 6) then (i >= 1) /\ (i <= 6) endif);
 
   
