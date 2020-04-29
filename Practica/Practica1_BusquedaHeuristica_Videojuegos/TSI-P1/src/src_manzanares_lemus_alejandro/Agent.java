@@ -8,8 +8,6 @@ import tools.ElapsedCpuTimer;
 import tools.Pair;
 import tools.Vector2d;
 
-import java.awt.*;
-import java.awt.desktop.SystemEventListener;
 import java.util.*;
 
 import static java.util.Collections.*;
@@ -20,7 +18,7 @@ enum Nivel{
 }
 
 public class Agent extends AbstractPlayer {
-  private Nivel estado = Nivel.RS;
+  private Nivel estado = Nivel.RD;
 
   private Vector2d fescala;
   private Vector2d portal;
