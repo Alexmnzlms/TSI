@@ -1,4 +1,4 @@
-% Ejercicio 2 - Numero de 10 digitos.
+% Ejercicio 3 - Asignación de horario
 % Autor: Alejandro Manzanares Lemus
 include "globals.mzn";
 
