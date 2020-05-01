@@ -5,7 +5,7 @@ include "globals.mzn";
 set of int: PROF = 1..6;
 set of int: HORA = 1..6;
 array[HORA] of var PROF: horario;
-array[HORA] of string: strHorario = ["9:00h - 10:00h", "10:00h - 11:00h", "11:00h - 12:00h", "12:00h - 13:00h", "13:00h - 14:00h", "14:00h - 15:00h"];
+array[HORA] of string: strHorario = ["09:00h - 10:00h", "10:00h - 11:00h", "11:00h - 12:00h", "12:00h - 13:00h", "13:00h - 14:00h", "14:00h - 15:00h"];
 
 % 1. Definición de variables y constantes:
 
@@ -33,4 +33,4 @@ solve satisfy;
 
 % 4. Definición del output:
 
-output ["\(strHorario[i]) = \("Profesor") \(horario[i])\n" | i in HORA];
+output ["\(strHorario[i]) = Profesor \(horario[i])\n" | i in HORA];
