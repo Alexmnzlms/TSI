@@ -1,4 +1,4 @@
-% Ejercicio 6 -.
+% Ejercicio 6 - Vecindario.
 % Autor: Alejandro Manzanares Lemus
 include "globals.mzn";
 
@@ -104,7 +104,6 @@ output ["\n"];
 output ["Bebida:\t\t"];
 output ["\(strBebida[i]) = Persona \(bebida[i])\t" | i in 1..5];
 output ["\n"];
-
 
 % Persona 1: El escultor vasco vive en la tercera casa, que es roja, tiene caracoles y bebe leche
 % Persona 2: El pintor gallego vive en la quinta casa, que es verde, tiene una cebra y bebe cafe
