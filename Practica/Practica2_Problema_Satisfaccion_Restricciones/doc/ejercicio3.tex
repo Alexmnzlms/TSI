@@ -1,3 +1,33 @@
-\chapter{Ejercicio 3}
+\section{Ejercicio 3}
+\subsection{Representación}
+La representación del problema se implementa mediante un array con tantas posiciones como profesores debemos asignar.
 
-\includegraphics[scale=1]{ej3.png}
+\subsection{Restricciones}
+Las restricciones se pueden traducir literalmente acotando que para determinada i esta se encuentre en un rango determinado.
+
+\subsection{Solución}
+
+Las asignación que aporta MiniZinc es la siguiente:
+
+\begin{figure}[h]
+   \centering
+   \begin{subfigure}[b]{0.45\textwidth}
+      \includegraphics[scale=0.5]{ej3.png}
+   \end{subfigure}
+   \hfill
+   \begin{subfigure}[b]{0.45\textwidth}
+      \begin{table}[H]
+      \resizebox{0.8\textwidth}{!}{%
+      \begin{tabular}{|l|l|}
+      \hline
+      09:00 a 10:00 & Prof-6 \\ \hline
+      10:00 a 11:00 & Prof-4 \\ \hline
+      11:00 a 12:00 & Prof-5 \\ \hline
+      12:00 a 13:00 & Prof-2 \\ \hline
+      13:00 a 14:00 & Prof-3 \\ \hline
+      14:00 a 15:00 & Prof-1 \\ \hline
+      \end{tabular}
+      }
+      \end{table}
+   \end{subfigure}
+\end{figure}

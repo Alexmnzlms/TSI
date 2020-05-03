@@ -1,1 +1,22 @@
-\chapter{Ejercicio 10}
+\section{Ejercicio 10}
+
+\subsection{Representación}
+En este caso adoptamos la clásica representación del problema de la mochila como un array binario en el que 0 significa no coger el objeto i y 1 significa cogerlo. Además se utilizan dos arrays auxiliares para almacenar los pesos de los objetos y sus preferencias. Se utilizan dos variables auxiliares para maximizar la suma y controlar el peso.
+
+\subsection{Restricciones}
+Las restricciones son que el peso no supere los 275kg y que la preferencia de la selección sea máxima. La suma de la preferencia y el peso se calcula sumando los pesos o preferencias de los elementos i == 1 del array \emph{asignacion}.
+
+\subsection{Solución}
+La asignación que MiniZinc encuentra que cumple las restricciones es coger:
+\begin{itemize}
+   \item El mapa.
+   \item El compás.
+   \item El agua.
+   \item El sándwich.
+   \item El azúcar.
+   \item El queso.
+   \item El protector solar.
+\end{itemize}
+La suma de estos pesos es 274 y la preferencia es 705.
+
+\includegraphics[scale=0.5]{ej10.png}

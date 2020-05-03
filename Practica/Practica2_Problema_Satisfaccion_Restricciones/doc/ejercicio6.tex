@@ -1,3 +1,17 @@
-\chapter{Ejercicio 6}
+\section{Ejercicio 6}
+\subsection{Representación}
+Para la representación de este problema se ha optado por utilizar un array por cada atributo de las personas, es decir, uno para el color de la casa, otro para la posición, otro para la ``nacionalidad'', otro para el animal que tiene y otro para lo que bebe. Cada posición i de esos vectores representa la persona asociada al atributo posición de i.
 
-\includegraphics[scale=1]{ej6.png}
+\subsection{Restricciones}
+Las restricciones de este problema son explicitas, por lo que su implementación es trivial, salvo las restricciones que aluden a la posición de las casas. En este caso se ha de comprobar que dos personas j e i que cumplan una restricción a su vez cumplan que las posiciones de sus casa se adecuen a la restricción. Por ejemplo, si j e i son las casa verde y blanca respectivamente, se debe cumplir que la posición de j sea posición de i + 1.
+
+\subsection{Solución}
+La respuesta es: La cebra está con el pintor gallego y el diplomático andaluz bebe agua.\\
+\\
+Persona 1: El escultor vasco vive en la tercera casa, que es roja, tiene caracoles y bebe leche.\\
+Persona 2: El pintor gallego vive en la quinta casa, que es verde, tiene una \textbf{cebra} y bebe café.\\
+Persona 3: El diplomático andaluz vive en la primera casa, que es amarilla, tiene un zorro y bebe \textbf{agua}.\\
+Persona 4: El medico navarro vive en la segunda casa, que es azul, tiene un caballo y bebe té.\\
+Persona 5: El violinista catalán vive en la cuarta casa, que es blanca, tiene un perro y bebe zumo.\\
+
+\includegraphics[scale=0.32]{ej6.png}

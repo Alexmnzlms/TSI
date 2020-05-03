@@ -1,3 +1,31 @@
-\chapter{Ejercicio 1}
+\section{Ejercicio 1}
+\subsection{Representación}
+La representación de este problema se implementa en base a dos array de enteros. El array \emph{letras} almacena los valores asignados a cada letra y el array \emph{acarreo} almacena el acarreo de las 5 sumas de letras que debemos realizar.
 
-\includegraphics[scale=1]{ej1.png}
+\subsection{Restricciones}
+Las sumas individuales que se realizan en este puzzle son:
+\begin{itemize}
+   \item $ E + E + E = E$
+   \item $ T + T + N + acarreo = T$
+   \item $ S + S + I + acarreo = F$
+   \item $ E + E + E + acarreo = A$
+   \item $ T + F + D + acarreo = R$
+   \item $ K = acarreo $
+\end{itemize}
+
+Estas son las restricciones que debemos satisfacer. Para esto, establecemos que cada suma de 3 letras debe ser igual al resultado correspondiente una vez aplicado la operación modulo 10.
+\\
+Por ejemplo: $ (E + E + E)\% 10 = E $.
+\\
+Además calculamos el acarreo para la siguiente suma como el resultado de la operación anterior, pero esta vez dividido por 10.
+\\
+En el mismo ejemplo: $acarreo = \frac{E+E+E}{10}$
+\\
+En la última suma sabemos que $K$ será igual al último $acarreo$ calculado.
+
+\subsection{Solución}
+MiniZinc encuentra la siguiente asignación de valores:\\
+\\
+$TESTE + FESTE + DEINE = 30830 + 60830 + 50970 = 142630 = KRAFTE $\\
+\\
+\includegraphics[scale=0.5]{ej1.png}

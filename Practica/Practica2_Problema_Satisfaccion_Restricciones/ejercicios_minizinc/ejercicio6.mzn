@@ -45,9 +45,7 @@ constraint (nacionalidad[5] == casa[1]);
 constraint (color[2] == bebida[2]);
 
 % La casa verde está al lado de la blanca y a su derecha.
-constraint forall(i,j in 1..5)(if (i == color[2] /\ j == color[3] ) 
-                               then ((j == casa[1] /\ i == casa[2]) \/ (j == casa[2] /\ i == casa[3]) \/ 
-                                    (j == casa[3] /\ i == casa[4]) \/ (j == casa[4] /\ i == casa[5])) endif);
+constraint forall(i,j in 1..5)(if (i == color[2] /\ j == color[3] ) then ((j == casa[1] /\ i == casa[2]) \/ (j == casa[2] /\ i == casa[3]) \/ (j == casa[3] /\ i == casa[4]) \/ (j == casa[4] /\ i == casa[5])) endif);
                          
 % El escultor cría caracoles.           
 constraint (profesion[2] == animal[2]);
@@ -59,28 +57,16 @@ constraint (profesion[3] == color[4]);
 constraint (casa[3] == bebida[3]);
 
 % La casa del andaluz está al lado de la azul.
-constraint forall(i,j in 1..5)(if (i == nacionalidad[5] /\ j == color[5]) then (((i == casa[1] /\ j == casa[2]) \/ (j == casa[1] /\ i == casa[2])) \/ 
-                                                                                ((i == casa[2] /\ j == casa[3]) \/ (j == casa[2] /\ i == casa[3])) \/
-                                                                                ((i == casa[3] /\ j == casa[4]) \/ (j == casa[3] /\ i == casa[4])) \/
-                                                                                ((i == casa[4] /\ j == casa[5]) \/ (j == casa[4] /\ i == casa[5]))                                                                 
-                                                                                                                                                  ) endif);
+constraint forall(i,j in 1..5)(if (i == nacionalidad[5] /\ j == color[5]) then (((i == casa[1] /\ j == casa[2]) \/ (j == casa[1] /\ i == casa[2])) \/ ((i == casa[2] /\ j == casa[3]) \/ (j == casa[2] /\ i == casa[3])) \/ ((i == casa[3] /\ j == casa[4]) \/ (j == casa[3] /\ i == casa[4])) \/ ((i == casa[4] /\ j == casa[5]) \/ (j == casa[4] /\ i == casa[5]))                                                                 ) endif);
                   
 % El violinista bebe zumo.                  
 constraint (profesion[4] == bebida[4]);
 
 % El zorro está en una casa al lado de la del médico.
-constraint forall(i,j in 1..5)(if (i == animal[3] /\ j == profesion[5]) then (((i == casa[1] /\ j == casa[2]) \/ (j == casa[1] /\ i == casa[2])) \/ 
-                                                                                ((i == casa[2] /\ j == casa[3]) \/ (j == casa[2] /\ i == casa[3])) \/
-                                                                                ((i == casa[3] /\ j == casa[4]) \/ (j == casa[3] /\ i == casa[4])) \/
-                                                                                ((i == casa[4] /\ j == casa[5]) \/ (j == casa[4] /\ i == casa[5]))                                                                 
-                                                                                                                                                  ) endif);
+constraint forall(i,j in 1..5)(if (i == animal[3] /\ j == profesion[5]) then (((i == casa[1] /\ j == casa[2]) \/ (j == casa[1] /\ i == casa[2])) \/ ((i == casa[2] /\ j == casa[3]) \/ (j == casa[2] /\ i == casa[3])) \/ ((i == casa[3] /\ j == casa[4]) \/ (j == casa[3] /\ i == casa[4])) \/ ((i == casa[4] /\ j == casa[5]) \/ (j == casa[4] /\ i == casa[5]))                                                                 ) endif);
 
 % % El caballo está en una casa al lado de la del diplomático.
-constraint forall(i,j in 1..5)(if (i == animal[4] /\ j == profesion[3]) then (((i == casa[1] /\ j == casa[2]) \/ (j == casa[1] /\ i == casa[2])) \/ 
-                                                                                ((i == casa[2] /\ j == casa[3]) \/ (j == casa[2] /\ i == casa[3])) \/
-                                                                                ((i == casa[3] /\ j == casa[4]) \/ (j == casa[3] /\ i == casa[4])) \/
-                                                                                ((i == casa[4] /\ j == casa[5]) \/ (j == casa[4] /\ i == casa[5]))                                                                 
-                                                                                                                                                  ) endif);
+constraint forall(i,j in 1..5)(if (i == animal[4] /\ j == profesion[3]) then (((i == casa[1] /\ j == casa[2]) \/ (j == casa[1] /\ i == casa[2])) \/ ((i == casa[2] /\ j == casa[3]) \/ (j == casa[2] /\ i == casa[3])) \/ ((i == casa[3] /\ j == casa[4]) \/ (j == casa[3] /\ i == casa[4])) \/ ((i == casa[4] /\ j == casa[5]) \/ (j == casa[4] /\ i == casa[5]))                                                                 ) endif);
 
 % 3. Definición del problema:
 solve satisfy;

@@ -1,3 +1,21 @@
-\chapter{Ejercicio 4}
+\section{Ejercicio 4}
+\subsection{Representación}
+La representación de este problema se basa en un array bidimensional y dos arrays unidimensionales. El array bidimensional representa la matriz formada por las horas disponibles y las aulas. Esta matriz es de 4x4. El array \emph{asig} representa los códigos asignados a cada asignatura (1-12) más los códigos designados a los espacios vacíos (13-16). De esta manera tenemos 16 ``asignaturas'' a repartir entre 16 huecos de la matriz. Por último, el array \emph{prof} en el que cada posición i representa una asignatura y el contenido de la posición i, el profesor encargado de dar esa asignatura.
 
-\includegraphics[scale=1]{ej4.png}
+\subsection{Restricciones}
+En este problema necesitamos cumplir las restricciones de que ninguna asignatura puede impartirse dos veces y que ningún profesor puede dar dos asignaturas a la vez. Además debemos cumplir las restricciones de cada profesor.\\
+Para comprobar que un profesor no da dos asignaturas a la vez, debemos restringir que las parejas de asignaturas que estén en la misma fila, no pueden tener el mismo profesor asignado. Las restricciones de cada profesor se implementan igual que en el ejercicio anterior.
+
+\subsection{Solución}
+Minizinc encuentra la siguiente asignación que resuelve el problema:
+\begin{table}[H]
+\begin{tabular}{ccccc}
+ & \textbf{A1} & \textbf{A2} & \textbf{A3} & \textbf{A4} \\ \cline{2-5}
+\multicolumn{1}{c|}{\textbf{09:00 a 10:00}} &  &  & TSI-G4 & TSI-G2 \\
+\multicolumn{1}{c|}{\textbf{10:00 a 11:00}} &  &  & TSI-G3 & TSI-G1 \\
+\multicolumn{1}{c|}{\textbf{11:00 a 12:00}} & FBD-G4 & FBD-G2 & IA-G4 & IA-G2 \\
+\multicolumn{1}{c|}{\textbf{12:00 a 13:00}} & FBD-G3 & FBD-G1 & IA-G3 & IA-G1
+\end{tabular}
+\end{table}
+
+\includegraphics[scale=0.27]{ej4.png}

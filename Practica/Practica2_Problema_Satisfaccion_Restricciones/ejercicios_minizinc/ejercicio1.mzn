@@ -10,7 +10,6 @@ array[POS] of string: strLetras = ["T", "E", "S", "F", "D", "I", "N", "A", "R", 
 array[1..5] of var NUM: acarreo;
 
 % 2. Definición de restricciones:
-
 constraint alldifferent(letras);
   
 % E + E + E = E
@@ -35,10 +34,8 @@ constraint (acarreo[5] = (letras[1] + letras[4] + letras[5] + acarreo[4]) div 10
   
 %K
 constraint(letras[10] = acarreo[5]);
-  
 
 % 3. Definición del problema:
-
 solve satisfy;
 
 % 4. Definición del output:
