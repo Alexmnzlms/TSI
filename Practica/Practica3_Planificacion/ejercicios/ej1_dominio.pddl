@@ -1,7 +1,7 @@
 (define (domain p3dom)
    (:requirements :adl)
    (:types
-       posicinable localizacion - object
+       posicionable localizacion - object
        unidad edificio recurso - posicionable
    )
    (:constants 
@@ -26,12 +26,6 @@
          (and
             (camino ?x ?y)
             (en ?u ?x)
-            (forall (?u - unidad ?e - edificio)
-               (and
-                  (not (en ?u ?y))
-                  (not (en ?e ?y))
-               )
-            )
          )
       :effect
          (and
@@ -41,12 +35,11 @@
    )
 
    (:action Asignar
-      :parameters (?u - unidad ?r - recurso ?x ?y - localizacion)
+      :parameters (?u - unidad ?r - recurso ?x - localizacion)
       :precondition
          (and
             (en ?u ?x)
-            (en ?r ?y)
-            (= ?x ?y)
+            (en ?r ?x)
          )
       :effect
          (and
