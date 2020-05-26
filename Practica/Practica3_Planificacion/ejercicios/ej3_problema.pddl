@@ -3,7 +3,6 @@
     (:objects
         vce1 vce2 vce3 - unidad
         centro barracon extractor - edificio
-        mineral1 mineral2 mineral3 gas1 gas2 - recurso
         c1_1 c1_2 c1_3 c1_4 c1_5 c2_1 c2_2 c2_3 c2_4 c2_5 c3_1 c3_2 c3_3 c3_4 c3_5 c4_1 c4_2 c4_3 c4_4 c4_5 c5_1 c5_2 c5_3 c5_4 c5_5 - localizacion
     )
     (:init
@@ -12,25 +11,20 @@
         (esTipoUnidad vce3 VCE)
         (esTipoEdificio centro CentroDeMando)
         (esTipoEdificio barracon Barracones)
-        (esTipoRecurso mineral1 Minerales)
-        (esTipoRecurso mineral2 Minerales)
-        (esTipoRecurso mineral3 Minerales)
-        (esTipoRecurso gas1 Gas)
-        (esTipoRecurso gas2 Gas)
-        (necesita centro Minerales)
-        (necesita barracon Minerales)
+        (esTipoEdificio extractor Extractor)
+        (necesita CentroDeMando Minerales)
+        (necesita CentroDeMando Gas)
+        (necesita Barracones Minerales)
+        (necesita Extractor Minerales)
         (en centro c3_3)
-        (en mineral1 c1_1)
-        (en mineral2 c1_2)
-        (en mineral3 c1_3)
-        (en gas1 c5_1)
-        (en gas2 c5_2)
+        (en Minerales c1_1)
+        (en Minerales c1_2)
+        (en Minerales c1_3)
+        (en Gas c5_1)
+        (en Gas c5_2)
         (en vce1 c2_2)
         (en vce2 c2_3)
         (en vce3 c2_4)
-        (esTipoEdificio extractor Extractor)
-        (necesita extractor Minerales)
-        (necesita centro Gas)
         (camino c1_1 c2_1)
         (camino c1_1 c1_2)
         (camino c1_2 c2_2)

@@ -2,22 +2,20 @@
    (:requirements :adl)
    (:types
        posicionable localizacion - object
-       unidad edificio recurso - posicionable
+       unidad edificio tipoUnidad tipoEdificio tipoRecurso - posicionable
    )
    (:constants 
-      CentroDeMando Barracones - tipoEdificio
+      CentroDeMando Barracones Extractor - tipoEdificio
       VCE - tipoUnidad
       Minerales Gas - tipoRecurso
    )
    (:predicates
       (en ?p - posicionable ?x - localizacion)
       (camino ?x - localizacion ?y - localizacion)
-      (extrae ?u - unidad ?r - recurso)
-      (construir ?e - edificio ?r - recurso)
+      (extrae ?u - unidad ?tr - tipoRecurso)
       (esTipoEdificio ?e - edificio ?t - tipoEdificio)
       (esTipoUnidad ?u - unidad ?t - tipoUnidad)
-      (esTipoRecurso ?r - recurso ?t - tipoRecurso)
-      (necesita ?e - edificio ?t - tipoRecurso)
+      (necesita ?te - tipoEdificio ?tr - tipoRecurso)
    )
 
    (:action Navegar
@@ -35,33 +33,33 @@
    )
 
    (:action Asignar
-      :parameters (?u - unidad ?r - recurso ?x - localizacion)
+      :parameters (?u - unidad ?tr - tipRecurso ?x - localizacion)
       :precondition
          (and
             (en ?u ?x)
-            (en ?r ?x)
+            (en ?tr ?x)
          )
       :effect
          (and
-            (extrae ?u ?r)
+            (extrae ?u ?tr)
          )
    )
 
    (:action Construir
-      :parameters (?u - unidad ?e - edificio ?x - localizacion)
+      :parameters (?u - unidad ?e - edificio ?te - tipoEdificio ?x - localizacion)
       :precondition
          (and
             (forall (?r - recurso)
                (not (extrae ?u ?r))
             )
-            (exists (?u1 - unidad ?r - recurso ?t - tipoRecurso)
+            (exists (?u1 - unidad ?tr - tipoRecurso ?te - tipoEdificio)
                (and 
-                  (extrae ?u1 ?r)
-                  (necesita ?e ?t)
-                  (esTipoRecurso ?r ?t)
+                  (extrae ?u1 ?tr)
+                  (necesita ?te ?tr)
                )
             )
             (en ?u ?x)
+            (esTipoEdificio ?e ?te)
          )
       :effect
          (and

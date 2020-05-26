@@ -2,7 +2,7 @@
    (:requirements :adl)
    (:types
        posicionable localizacion - object
-       unidad edificio recurso - posicionable
+       unidad edificio tipoUnidad tipoEdificio tipoRecurso - posicionable
    )
    (:constants 
       CentroDeMando Barracones Extractor - tipoEdificio
@@ -12,12 +12,10 @@
    (:predicates
       (en ?p - posicionable ?x - localizacion)
       (camino ?x - localizacion ?y - localizacion)
-      (extrae ?u - unidad ?r - recurso)
-      (construir ?e - edificio ?r - recurso)
+      (extrae ?u - unidad ?tr - tipoRecurso)
       (esTipoEdificio ?e - edificio ?t - tipoEdificio)
       (esTipoUnidad ?u - unidad ?t - tipoUnidad)
-      (esTipoRecurso ?r - recurso ?t - tipoRecurso)
-      (necesita ?e - edificio ?t - tipoRecurso)
+      (necesita ?te - tipoEdificio ?tr - tipoRecurso)
    )
 
    (:action Navegar
@@ -35,12 +33,12 @@
    )
 
    (:action Asignar
-      :parameters (?u - unidad ?r - recurso ?x - localizacion)
+      :parameters (?u - unidad ?tr - tipoRecurso ?x - localizacion)
       :precondition
          (or
             (and
                (en ?u ?x)
-               (en ?r ?x)
+               (en ?tr ?x)
                (exists (?e - edificio)
                   (and 
                      (en ?e ?x)
@@ -50,32 +48,32 @@
             )
             (and
                (en ?u ?x)
-               (en ?r ?x)
-               (not (esTipoRecurso ?r Gas))
+               (en ?tr ?x)
+               (not (en Gas ?x))
             )
          )
          
       :effect
          (and
-            (extrae ?u ?r)
+            (extrae ?u ?tr)
          )
    )
 
    (:action Construir
-      :parameters (?u - unidad ?e - edificio ?x - localizacion)
+      :parameters (?u - unidad ?e - edificio ?te - tipoEdificio ?x - localizacion)
       :precondition
          (and
-            (forall (?r - recurso)
-               (not (extrae ?u ?r))
+            (forall (?tr - recurso)
+               (not (extrae ?u ?tr))
             )
-            (exists (?u1 - unidad ?r - recurso ?t - tipoRecurso)
+            (exists (?u1 - unidad ?tr - tipoRecurso)
                (and 
-                  (extrae ?u1 ?r)
-                  (necesita ?e ?t)
-                  (esTipoRecurso ?r ?t)
+                  (extrae ?u1 ?tr)
+                  (necesita ?te ?tr)
                )
             )
             (en ?u ?x)
+            (esTipoEdificio ?e ?te)
          )
       :effect
          (and
