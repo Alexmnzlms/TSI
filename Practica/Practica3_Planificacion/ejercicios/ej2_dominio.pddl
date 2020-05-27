@@ -63,7 +63,7 @@
       :parameters (?u - unidad ?e - edificio ?te - tipoEdificio ?x - localizacion)
       :precondition
          (and
-            (forall (?tr - recurso)
+            (forall (?tr - tipoRecurso)
                (not (extrae ?u ?tr))
             )
             (exists (?u1 - unidad ?tr - tipoRecurso)

@@ -83,6 +83,11 @@
                     )
                 )
             )
+            (forall (?e1 - edificio) 
+                (and
+                    (not (en ?e1 ?x))
+                )
+            )
             (en ?u ?x)
             (esTipoEdificio ?e ?te)
             (esTipoUnidad ?u VCE)
@@ -93,7 +98,7 @@
         )
     )
     (:action Reclutar
-    :parameters (?u - unidad ?tu - tipoUnidad ?x - localizacion)
+    :parameters (?u - unidad ?tu - tipoUnidad ?te - tipoEdificio ?x - localizacion)
     :precondition
         (and
             (esTipoUnidad ?u ?tu)
@@ -110,10 +115,11 @@
                     )
                 )
             )
-            (exists (?te - tipoEdificio)
+            (exists (?e - edificio)
                 (and
+                    (esTipoEdificio ?e ?te)
                     (recluta ?te ?tu)
-                    (en ?te ?x)
+                    (en ?e ?x)
                 )   
             )
         )

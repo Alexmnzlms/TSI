@@ -19,51 +19,51 @@
    )
 
    (:action Navegar
-      :parameters (?u - unidad ?x ?y - localizacion)
-      :precondition
-         (and
-            (camino ?x ?y)
-            (en ?u ?x)
-         )
-      :effect
-         (and
-            (en ?u ?y)
-            (not (en ?u ?x))
-         )
-   )
+   :parameters (?u - unidad ?x ?y - localizacion)
+   :precondition
+      (and
+         (camino ?x ?y)
+         (en ?u ?x)
+      )
+   :effect
+      (and
+         (en ?u ?y)
+         (not (en ?u ?x))
+      )
+)
 
    (:action Asignar
-      :parameters (?u - unidad ?tr - tipRecurso ?x - localizacion)
-      :precondition
-         (and
-            (en ?u ?x)
-            (en ?tr ?x)
-         )
-      :effect
-         (and
-            (extrae ?u ?tr)
-         )
+   :parameters (?u - unidad ?tr - tipRecurso ?x - localizacion)
+   :precondition
+      (and
+         (en ?u ?x)
+         (en ?tr ?x)
+      )
+   :effect
+      (and
+         (extrae ?u ?tr)
+      )
    )
 
    (:action Construir
-      :parameters (?u - unidad ?e - edificio ?te - tipoEdificio ?x - localizacion)
-      :precondition
-         (and
-            (forall (?r - recurso)
-               (not (extrae ?u ?r))
-            )
-            (exists (?u1 - unidad ?tr - tipoRecurso ?te - tipoEdificio)
-               (and 
-                  (extrae ?u1 ?tr)
-                  (necesita ?te ?tr)
-               )
-            )
-            (en ?u ?x)
-            (esTipoEdificio ?e ?te)
+   :parameters (?u - unidad ?e - edificio ?te - tipoEdificio ?x - localizacion)
+   :precondition
+      (and
+         (forall (?tr - tipoRecurso)
+            (not (extrae ?u ?tr))
          )
-      :effect
-         (and
-            (en ?e ?x)
+         (exists (?u1 - unidad ?tr - tipoRecurso)
+            (and 
+               (extrae ?u1 ?tr)
+               (necesita ?te ?tr)
+            )
          )
+         (en ?u ?x)
+         (esTipoEdificio ?e ?te)
+      )
+   :effect
+      (and
+         (en ?e ?x)
+      )
    )
 )

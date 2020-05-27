@@ -33,8 +33,6 @@
         (en Gas c5_1)
         (en Gas c5_2)
         (en vce1 c2_2)
-        (en vce2 c2_3)
-        (en vce3 c2_4)
         (camino c1_1 c2_1)
         (camino c1_1 c1_2)
         (camino c1_2 c2_2)
