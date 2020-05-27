@@ -30,10 +30,10 @@
          (en ?u ?y)
          (not (en ?u ?x))
       )
-)
+   )
 
    (:action Asignar
-   :parameters (?u - unidad ?tr - tipRecurso ?x - localizacion)
+   :parameters (?u - unidad ?tr - tipoRecurso ?x - localizacion)
    :precondition
       (and
          (en ?u ?x)
