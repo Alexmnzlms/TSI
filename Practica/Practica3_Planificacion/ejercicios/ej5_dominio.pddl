@@ -98,6 +98,9 @@
     :precondition
         (and
             (esTipoUnidad ?u ?tu)
+            (forall (?y - localizacion)
+                (not (en ?u ?y))
+            )
             (forall (?tr - tipoRecurso)
                 (and
                     (imply
