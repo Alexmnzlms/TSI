@@ -33,30 +33,25 @@
    )
 
    (:action Asignar
-      :parameters (?u - unidad ?tr - tipoRecurso ?x - localizacion)
-      :precondition
+   :parameters (?u - unidad ?tr - tipoRecurso ?x - localizacion)
+   :precondition
+      (and
+         (en ?u ?x)
+         (en ?tr ?x)
          (or
-            (and
-               (en ?u ?x)
-               (en ?tr ?x)
-               (exists (?e - edificio)
-                  (and 
-                     (en ?e ?x)
-                     (esTipoEdificio ?e Extractor)
-                  )
+            (exists (?e - edificio)
+               (and 
+                  (en ?e ?x)
+                  (esTipoEdificio ?e Extractor)
                )
             )
-            (and
-               (en ?u ?x)
-               (en ?tr ?x)
-               (not (en Gas ?x))
-            )
+            (not (en Gas ?x))
          )
-         
-      :effect
-         (and
-            (extrae ?u ?tr)
-         )
+      )
+   :effect
+      (and
+         (extrae ?u ?tr)
+      )
    )
 
    (:action Construir
