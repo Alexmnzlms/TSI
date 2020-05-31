@@ -1,16 +1,15 @@
-En esta memoria se detallarán las decisiones tomadas en la realización de los ejercicios propuestos de planificación con PDDL. En el ejercicio 1 se detallarán las características del dominio en su totalidad, mientras que en los siguientes solo se hará mención a los cambios realzados en el mismo, entendiendo que las partes no mencionadas permanecen inalteradas.
+En esta memoria se detallarán las decisiones tomadas en la realización de los ejercicios propuestos de planificación con PDDL. En el ejercicio 1 se detallarán las características del dominio en su totalidad, mientras que en los siguientes solo se hará mención a los cambios realzados en el mismo.
 
 \section{Ejercicio 1}
-\subsection{Tipos}
-Se han definido dos tipos principales: \textbf{Posicinable} y \textbf{Localizaciones}. El tipo Localizaciones representa las posibles posiciones dentro de la matriz del mundo dentro de la que las unidades, edificios y recursos pueden encontrarse. El tipo Posicionable es un supertipo para los subtipos de \textbf{unidad}, \textbf{edificio}, \textbf{tipoUnidad}, \textbf{tipoRecurso}, \textbf{tipoEdificio}. El supertipo Posicionable representa objetos del dominio/problema que pueden ocupar una posición en el mundo. Los subtipos unidad y edificio representan a unidades y edificios concretos, mientras que los tipos tipoX representan el tipo de la entidad X. Notar que existe un tipo llamado tipoRecurso pero no uno llamado recurso, esto es debido a que las unidades y edificios pueden tener instancias concretas, mientras que para representar los recursos simplemente necesitamos asociar un tipo de recurso a una casilla concreta, sin necesidad de crear una instancia concreta del mismo.
-
-\subsubsection{Constantes}
+\subsection{Tipos y constantes}
+Se han definido dos tipos principales: \textbf{posicionable} y \textbf{localizaciones}. El tipo localizaciones representa las posibles posiciones dentro de la matriz del mundo dentro de la que las unidades, edificios y recursos pueden encontrarse. El tipo posicionable es un supertipo para los subtipos de \textbf{unidad}, \textbf{edificio}, \textbf{tipoUnidad}, \textbf{tipoRecurso}, \textbf{tipoEdificio}. El supertipo posicionable representa objetos del dominio/problema que pueden ocupar una posición en el mundo. Los subtipos unidad y edificio representan a unidades y edificios concretos, mientras que los tipos tipoX representan el tipo de la entidad X. Notar que existe un tipo llamado tipoRecurso pero no uno llamado recurso, esto es debido a que las unidades y edificios pueden tener instancias concretas, mientras que para representar los recursos simplemente necesitamos asociar un tipo de recurso a una casilla concreta, sin necesidad de crear una instancia concreta del mismo.
+\\\\
 Se han definido las constantes \textbf{CentroDeMando} y \textbf{Barracones} del tipo tipoEdificio, \textbf{VCE} del tipo tipoUnidad y \textbf{Minerales} y \textbf{Gas} del tipo tipoRecurso.
 
 \subsection{Predicados}
 \begin{itemize}
-   \item El predicado \textit{EN} establece la relación entre una entidad de tipo Posicionable y una entidad de tipo Localizaciones, es decir, establece la posición de una entidad concreta en una localización concreta.
-   \item El predicado \textit{CAMINO} establece la relación entre dos entidades de tipo Localizaciones. Esto permite establecer las conexiones entre las distintas posiciones que componen el mundo representado.
+   \item El predicado \textit{EN} establece la relación entre una entidad de tipo posicionable y una entidad de tipo localizaciones, es decir, establece la posición de una entidad concreta en una localización concreta.
+   \item El predicado \textit{CAMINO} establece la relación entre dos entidades de tipo localizaciones. Esto permite establecer las conexiones entre las distintas posiciones que componen el mundo representado.
    \item El predicado \textit{EXTRAE} establece la relación entre una entidad de tipo unidad y otra de tipoRecurso. Esta relación establece que una unidad concreta se encuentra extrayendo un tipo de recurso.
    \item El predicado \textit{NECESITA} establece una relación entre una entidad tipoEdificio y otra de tipo tipoRecurso. Establece el tipo de recurso que necesita un tipo de edificio para poder construirse.
    \item El predicado \textit{ESTIPOEDIFICIO} establece una relación entre una entidad de tipo edificio y otra de tipoEdificio, es decir, especifica el tipo de edificio que es una construccion especifica.
@@ -20,53 +19,139 @@ Se han definido las constantes \textbf{CentroDeMando} y \textbf{Barracones} del 
 \subsection{Acciones}
 En este nivel se implementan las 3 acciones básicas \textbf{Navegar}, \textbf{Asignar} y \textbf{Construir}
 \begin{itemize}
-   \item \textbf{Navegar}:
+   \item \textbf{Navegar}: Esta acción se encarga de mover una unidad de una localización a otra adyacente.
       \begin{itemize}
-         \item Parametros:
-         \item Precondiciones:
-         \item Efecto:
+         \item Parámetros: una unidad concreta y dos localizaciones.
+         \item Precondiciones: Debe existir un camino entre las dos localizaciones y la unidad debe estar en la primera localización
+         \item Efecto: La unidad esta en la segunda localización y ya no esta en la primera localización.
       \end{itemize}
-   \item \textbf{Asignar}:
-   \item \textbf{Construir}:
+   \item \textbf{Asignar}: Esta acción se encarga de asignar una unidad a un tipo de recurso para que lo extraiga en una localización concreta.
+   \begin{itemize}
+      \item Parámetros: Una unidad concreta, un tipo de recurso y una localización.
+      \item Precondiciones: La unidad debe estar en la localización y también debe existir ese tipo de recurso en la misma.
+      \item Efecto: La unidad extrae el tipo de recurso
+   \end{itemize}
+   \item \textbf{Construir}: Esta acción se encarga de construir un edificio en una localización.
+   \begin{itemize}
+      \item Parámetros: una unidad y edificio específicos, un tipo de edificio y una localización.
+      \item Precondiciones: Para todo tipo de recurso la unidad que construye no esta extrayendo ninguno (la unidad esta libre). Existe una unidad distinta y un tipo de recurso tal que la unidad se encarga de extraer el recurso que se necesita para construir el tipo de edificio que se quiere construir. La unidad debe estar en la localización donde se quiere construir. El edificio debe ser del tipo de edificio deseado.
+      \item Efecto: El edificio se encuentra construido en la localización.
+   \end{itemize}
 \end{itemize}
 \subsection{Problema y solución}
+El objetivo de este ejercicio es construir un barracón en una localización concreta.\\
+Para la resolución del problema se establece un mundo de 5x5 de tamaño. Se definen 3 unidades del tipo VCE, un centro de tipo CentroDeMando y un barracón de tipo Barracones.\\
+Se establecen los caminos existentes en la matriz y en que posiciones se encuentran las unidades, los tipos de recursos y los edificios. Finalmente se establece el tipo de recurso necesario para construir cada tipo de edificio.\\
+Metric-FF encuentra un plan basado en mover un VCE a la posición donde se quiere construir el barracón y mover otro a una localización con minerales para extraerlos y poder construir el barracón.
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=\textwidth]{Plan2.png}
+\end{figure}
 
 \section{Ejercicio 2}
-
-\subsection{Tipos}
-\subsubsection{Constantes}
-\subsection{Predicados}
+\subsection{Tipos y constantes}
+Se ha añadido la constante \textbf{Extractor} para representar el nuevo tipo de edificio.
 \subsection{Acciones}
+\begin{itemize}
+   \item \textbf{Asignar}:
+   \begin{itemize}
+      \item Parámetros: Una unidad concreta, un tipo de recurso y una localización.
+      \item Precondiciones: La unidad debe estar en la localización y también debe existir ese tipo de recurso en la misma. Además deben cumplirse dos condiciones, o en la localización no hay un tipo de recurso Gas o existe un edificio en la localización es de tipo Extractor.
+      \item Efecto: La unidad extrae el tipo de recurso
+   \end{itemize}
+   \end{itemize}
 \subsection{Problema y solución}
+El objetivo de este ejercicio es construir un barracón en una localización concreta.\\
+Además de todo lo definido en el problema anterior, debemos definir el tipo de recurso necesario para construir un extractor.\\
+Metric-FF encuentra un plan basado en mover un VCE a la posición donde se quiere construir el barracón y mover otro a una localización con minerales para extraerlos y poder construir el barracón.
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=\textwidth]{Plan3.png}
+\end{figure}
 
 \section{Ejercicio 3}
-
-\subsection{Tipos}
-\subsubsection{Constantes}
-\subsection{Predicados}
 \subsection{Acciones}
+\begin{itemize}
+   \item \textbf{Construir}: Esta acción se encarga de construir un edificio en una localización.
+   \begin{itemize}
+      \item Parámetros: una unidad y edificio específicos, un tipo de edificio y una localización.
+      \item Precondiciones: Para todo tipo de recurso la unidad que construye no esta extrayendo ninguno (la unidad esta libre). La unidad debe estar en la localización donde se quiere construir. El edificio debe ser del tipo de edificio deseado. Ahora se debe cumplir que para todo tipo de recuro si el tipo de edificio necesita el tipo de recurso para construirse, existe una unidad diferente a la que construye que se encarga de extraerlo. Esto lo haremos utilizando el operador imply que nos permite comprobar la segunda parte de una comprobación solo si la primera es cierta.
+      \item Efecto: El edificio se encuentra construido en la localización.
+   \end{itemize}
+\end{itemize}
 \subsection{Problema y solución}
+El objetivo de este ejercicio es construir un barracón en una localización concreta.\\
+Además de todo lo definido en el problema anterior, debemos añadir que ahora el centro de mando también necesita Minerales para construirse.\\
+Metric-FF encuentra un plan basado en mover un VCE a la posición donde se quiere construir el barracón y mover otro a una localización con minerales para extraerlos y poder construir el barracón.
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=\textwidth]{Plan3.png}
+\end{figure}
+
 
 \section{Ejercicio 4}
 
-\subsection{Tipos}
-\subsubsection{Constantes}
+\subsection{Tipos y constantes}
+Se ha restructurado la jerarquia de tipos. Ahora se ha añadido el subtipo \textbf{construible} (del supertipo posicionable) del que tipoUnidad y tipoEdificio son subtipos.
+\\\\
+Se han definido las constantes \textbf{Marines} y \textbf{Segadores} del tipo tipoEdificio.
 \subsection{Predicados}
+\begin{itemize}
+   \item El predicado \textit{NECESITA} establece ahora una relación entre una entidad construible y otra de tipo tipoRecurso. Establece el tipo de recurso que necesita un tipo de edificio o tipo de unidad para poder construirse.
+   \item El predicado \textit{RECLUTA} establece una relación entre un tipo de edificio y un tipo de unidad. Se definen asi que tipo de edificio reclutan que tipo de unidades.
+\end{itemize}
 \subsection{Acciones}
+\begin{itemize}
+   \item \textbf{Construir}: Esta acción se encarga de construir un edificio en una localización.
+   \begin{itemize}
+      \item Parámetros: una unidad y edificio específicos, un tipo de edificio y una localización.
+      \item Precondiciones: Para todo tipo de recurso la unidad que construye no esta extrayendo ninguno (la unidad esta libre). La unidad debe estar en la localización donde se quiere construir. El edificio debe ser del tipo de edificio deseado. Ahora se debe cumplir que para todo tipo de recuro si el tipo de edificio necesita el tipo de recurso para construirse, existe una unidad diferente a la que construye que se encarga de extraerlo y ademas esta unidad es un VCE. También la unidad que se encarga de construir debe ser de tipo VCE.
+      \item Efecto: El edificio se encuentra construido en la localización.
+   \end{itemize}
+   \item \textbf{Reclutar}: Esta acción se encarga de reclutar una unidad.
+   \begin{itemize}
+      \item Parámetros: una unidad específica, un tipo de unidad, un tipo de edificio y una localización concreta.
+      \item Precondiciones: El tipo de la unidad especifica coincide con el tipo de unidad que . Para todo tipo de recurso, si el tipo de unidad que queremos reclutar necesita ese tipo de recurso, existe una unidad distinta de tipo VCE que se encarga de extraer ese recurso. Además existe un edificio concreto tal que es del tipo de edificio que recluta el tipo de unidad deseado y ademas esta en la localización.
+      \item Efecto: la unidad reclutada está en la localización.
+   \end{itemize}
+\end{itemize}
 \subsection{Problema y solución}
+El objetivo de este ejercicio es tener un marine en una localización concreta y un segador y un marine en otra.\\
+Además de todo lo definido en el problema anterior, ahora comenzamos solo con una unidad VCE y debemos añadir que recursos son necesarios para reclutar a las unidades y definir dos unidades de tipo Marines y una de tipo Segadores. También hay que especificar que tipo de edificio recluta a cada unidad.\\
+Metric-FF encuentra un plan basado en asignar el vce a recoger minerales, reclutar otro vce en el centro de mando, construir un extractor, construir un barracón y reclutar un marine en el, mover este marine a donde corresponde, asignar al vce a extraer gas y reclutar otro marine y un segador.
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=\textwidth]{Plan5.png}
+\end{figure}
+
 
 \section{Ejercicio 5}
 
-\subsection{Tipos}
-\subsubsection{Constantes}
+\subsection{Tipos y constantes}
 \subsection{Predicados}
 \subsection{Acciones}
 \subsection{Problema y solución}
+\begin{figure}[H]
+   \centering
+   \includegraphics[width=\textwidth]{Plan1.png}
+\end{figure}
+
 
 \section{Ejercicio 6}
 
-\subsection{Tipos}
-\subsubsection{Constantes}
+\subsection{Tipos y constantes}
 \subsection{Predicados}
 \subsection{Acciones}
 \subsection{Problema y solución}
+\begin{figure}[H]
+
+   \begin{subfigure}[b]{0.5\textwidth}
+      \centering
+      \includegraphics[width=0.5\textwidth]{Plan61.png}
+   \end{subfigure}
+   \hfill
+   \begin{subfigure}[b]{0.5\textwidth}
+      \centering
+      \includegraphics[width=0.9\textwidth]{Plan62.png}
+   \end{subfigure}
+\end{figure}
