@@ -43,10 +43,6 @@ El objetivo de este ejercicio es construir un barracón en una localización con
 Para la resolución del problema se establece un mundo de 5x5 de tamaño. Se definen 3 unidades del tipo VCE, un centro de tipo CentroDeMando y un barracón de tipo Barracones.\\
 Se establecen los caminos existentes en la matriz y en que posiciones se encuentran las unidades, los tipos de recursos y los edificios. Finalmente se establece el tipo de recurso necesario para construir cada tipo de edificio.\\
 Metric-FF encuentra un plan basado en mover un VCE a la posición donde se quiere construir el barracón y mover otro a una localización con minerales para extraerlos y poder construir el barracón.
-\begin{figure}[H]
-   \centering
-   \includegraphics[width=\textwidth]{Plan2.png}
-\end{figure}
 
 \section{Ejercicio 2}
 \subsection{Tipos y constantes}
@@ -57,17 +53,13 @@ Se ha añadido la constante \textbf{Extractor} para representar el nuevo tipo de
    \begin{itemize}
       \item Parámetros: Una unidad concreta, un tipo de recurso y una localización.
       \item Precondiciones: La unidad debe estar en la localización y también debe existir ese tipo de recurso en la misma. Además deben cumplirse dos condiciones, o en la localización no hay un tipo de recurso Gas o existe un edificio en la localización es de tipo Extractor.
-      \item Efecto: La unidad extrae el tipo de recurso
+      \item Efecto: La unidad extrae el tipo de recurso.
    \end{itemize}
 \end{itemize}
 \subsection{Problema y solución}
 El objetivo de este ejercicio es construir un barracón en una localización concreta.\\
 Además de todo lo definido en el problema anterior, debemos definir el tipo de recurso necesario para construir un extractor.\\
 Metric-FF encuentra un plan basado en mover un VCE a la posición donde se quiere construir el barracón y mover otro a una localización con minerales para extraerlos y poder construir el barracón.
-\begin{figure}[H]
-   \centering
-   \includegraphics[width=\textwidth]{Plan3.png}
-\end{figure}
 
 \section{Ejercicio 3}
 \subsection{Acciones}
@@ -83,10 +75,6 @@ Metric-FF encuentra un plan basado en mover un VCE a la posición donde se quier
 El objetivo de este ejercicio es construir un barracón en una localización concreta.\\
 Además de todo lo definido en el problema anterior, debemos añadir que ahora el centro de mando también necesita Minerales para construirse.\\
 Metric-FF encuentra un plan basado en mover un VCE a la posición donde se quiere construir el barracón y mover otro a una localización con minerales para extraerlos y poder construir el barracón.
-\begin{figure}[H]
-   \centering
-   \includegraphics[width=\textwidth]{Plan3.png}
-\end{figure}
 
 
 \section{Ejercicio 4}
@@ -117,12 +105,8 @@ Se han definido las constantes \textbf{Marines} y \textbf{Segadores} del tipo ti
 \end{itemize}
 \subsection{Problema y solución}
 El objetivo de este ejercicio es tener un marine en una localización concreta y un segador y un marine en otra.\\
-Además de todo lo definido en el problema anterior, ahora comenzamos solo con una unidad VCE y debemos añadir que recursos son necesarios para reclutar a las unidades y definir dos unidades de tipo Marines y una de tipo Segadores. También hay que especificar que tipo de edificio recluta a cada unidad.\\
-Metric-FF encuentra un plan basado en asignar el vce a recoger minerales, reclutar otro vce en el centro de mando, construir un extractor, construir un barracón y reclutar un marine en el, mover este marine a donde corresponde, asignar al vce a extraer gas y reclutar otro marine y un segador.
-\begin{figure}[H]
-   \centering
-   \includegraphics[width=\textwidth]{Plan4.png}
-\end{figure}
+Además de todo lo definido en el problema anterior, ahora comenzamos solo con una unidad VCE y un centro de mando y debemos añadir que recursos son necesarios para reclutar a las unidades y definir dos unidades de tipo Marines y una de tipo Segadores. También hay que especificar que tipo de edificio recluta a cada unidad.\\
+Metric-FF encuentra un plan basado en asignar el VCE a recoger minerales, reclutar otro VCE en el centro de mando, construir un extractor, construir un barracón y reclutar un marine en el, mover este marine a donde corresponde, asignar al VCE a extraer gas y reclutar otro marine y un segador.
 
 
 \section{Ejercicio 5}
@@ -130,7 +114,7 @@ Metric-FF encuentra un plan basado en asignar el vce a recoger minerales, reclut
 \subsection{Tipos y constantes}
 Se ha añadido el tipo principal \textbf{investigacion} que representa las investigaciones existentes.
 \\\\
-También se ha añadido la constante \textbf{BahiaDeInvestigacion}
+También se ha añadido la constante \textbf{BahiaDeInvestigacion}.
 \subsection{Predicados}
 \begin{itemize}
    \item El predicado \textit{NECESITAINV} establece una relación entre una investigación y el tipo de recurso que es necesario para poder realizarla.
@@ -142,31 +126,27 @@ También se ha añadido la constante \textbf{BahiaDeInvestigacion}
    \item \textbf{Reclutar}: Esta acción se encarga de reclutar una unidad.
    \begin{itemize}
       \item Parámetros: una unidad específica, un tipo de unidad, un tipo de edificio y una localización concreta.
-      \item Precondiciones: El tipo de la unidad especifica coincide con el tipo de unidad que queremos reclutar. Para todo tipo de recurso, si el tipo de unidad que queremos reclutar necesita ese tipo de recurso, existe una unidad distinta de tipo VCE que se encarga de extraer ese recurso. Además existe un edificio concreto tal que es del tipo de edificio que recluta el tipo de unidad deseado y ademas esta en la localización. Para toda investigacion si esta permite reclutar al tipo de unidad que queremos reclutar, entonces se ha de haber realizado la investigación. Conseguiremos esto aplicando de nuevo el operador imply.
+      \item Precondiciones: El tipo de la unidad especifica coincide con el tipo de unidad que queremos reclutar. Para todo tipo de recurso, si el tipo de unidad que queremos reclutar necesita ese tipo de recurso, existe una unidad distinta de tipo VCE que se encarga de extraer ese recurso. Además existe un edificio concreto tal que es del tipo de edificio que recluta el tipo de unidad deseado y ademas esta en la localización. Para toda investigación si esta permite reclutar al tipo de unidad que queremos reclutar, entonces se ha de haber realizado la investigación. Conseguiremos esto aplicando de nuevo el operador imply.
       \item Efecto: la unidad reclutada está en la localización.
    \end{itemize}
    \item \textbf{Investigar}:
    \begin{itemize}
       \item Parámetros: una entidad de tipo investigación
-      \item Precondiciones: Para todo tipo de recurso, si la investigacion necesita ese tipo de recurso, existe una unidad de tipo VCE que se encarga de extraer ese recurso. También deben existir una localización y un edificio tal que
-      \item Efecto: se ha realizado la investigación
+      \item Precondiciones: Para todo tipo de recurso, si la investigación necesita ese tipo de recurso, existe una unidad de tipo VCE que se encarga de extraer ese recurso. También deben existir una localización y un edificio tal que el edificio esta en la localización y es de tipo BahiaDeInvestigacion, es decir, para investigar debe existir una bahía de investigación.
+      \item Efecto: Se ha realizado la investigación.
    \end{itemize}
 \end{itemize}
 \subsection{Problema y solución}
 El objetivo de este ejercicio es tener un marine en una localización concreta y un segador y un marine en otra.\\
-Además de todo lo definido en el problema anterior, debemos establecer que recursos son necesarios para realizar las investigaciones y que investigaciones permiten reclutar que tipo de unidades. Tambien debemos definir y colocar una bahia de investigación\\
-Metric-FF encuentra un plan basado en asignar el vce a recoger minerales, reclutar otro vce en el centro de mando, construir un extractor, construir un barracón y reclutar un marine en el, mover este marine a donde corresponde, asignar al vce a extraer gas y reclutar otro marine y un segador.
-\begin{figure}[H]
-   \centering
-   \includegraphics[width=\textwidth]{Plan5.png}
-\end{figure}
+Además de todo lo definido en el problema anterior, debemos establecer que recursos son necesarios para realizar las investigaciones y que investigaciones permiten reclutar que tipo de unidades. También debemos definir y colocar una bahía de investigación\\
+Metric-FF encuentra un plan basado en asignar el VCE a recoger minerales, reclutar otro VCE en el centro de mando, construir un extractor, construir un barracón y reclutar un marine en el, mover este marine a donde corresponde, construir una bahía de investigación e investigar la mejora segador impulsor ,asignar al VCE a extraer gas y reclutar otro marine y un segador.
 
 
 \section{Ejercicio 6}
 \subsection{Tipos y constantes}
-Se ha añadido el tipo principal \textbf{investigacion} que representa las investigaciones existentes.
+Se ha añadido la constante \textbf{Deposito}.
 \subsection{Funciones}
-Para poder trabajar con datos numericos, en PDDL es necesario definir funciones:
+Para poder trabajar con datos numéricos, en PDDL es necesario definir funciones:
 \begin{itemize}
    \item La función \textit{COSTE} contiene el coste según un tipo de recurso para una entidad de tipo construible.
    \item La función \textit{COSTEINV} contiene el coste según un tipo de recurso para una entidad de tipo investigación.
@@ -186,7 +166,7 @@ Para poder trabajar con datos numericos, en PDDL es necesario definir funciones:
       \begin{itemize}
          \item Parámetros: Una unidad concreta, un tipo de recurso y una localización.
          \item Precondiciones: La unidad debe estar en la localización y también debe existir ese tipo de recurso en la misma. Deben cumplirse dos condiciones, o en la localización no hay un tipo de recurso Gas o existe un edificio en la localización es de tipo Extractor. Ademas ahora debe ser cierto que para todo tipo de recurso, la unidad no esta extrayendo dicho tipo de recurso.
-         \item Efecto: La unidad extrae el tipo de recurso
+         \item Efecto: La unidad extrae el tipo de recurso.
       \end{itemize}
    \item \textbf{Desasignar}:
          \begin{itemize}
@@ -198,37 +178,28 @@ Para poder trabajar con datos numericos, en PDDL es necesario definir funciones:
       \begin{itemize}
          \item Parámetros: una unidad y edificio específicos, un tipo de edificio y una localización.
          \item Precondiciones: Para todo tipo de recurso la unidad que construye no esta extrayendo ninguno (la unidad esta libre). La unidad debe estar en la localización donde se quiere construir. El edificio debe ser del tipo de edificio deseado. Ahora se debe cumplir que para todo tipo de recuro si el tipo de edificio necesita el tipo de recurso para construirse, existe una unidad diferente a la que construye que se encarga de extraerlo y ademas esta unidad es un VCE y además el coste en ese tipo de recursos para construir el tipo de edificio es menor que el número de recursos almacenados de ese tipo y menor que el limite de recursos de ese tipo que podemos almacenar. De esta manera conseguiremos que el limite de recursos que podemos almacenar siempre sea mayor que el coste más alto, reduciendo el espacio de búsqueda. También la unidad que se encarga de construir debe ser de tipo VCE.
-         \item Efecto: El edificio se encuentra construido en la localización.
+         \item Efecto: El edificio se encuentra construido en la localización. Cuando el tipo de edificio construido es Deposito, se suma al limite de cada tipoRecurso el INCREMENTALIMITE de Deposito. Se decrementa a ALMACENADO de cada tipo de recurso el coste en ese tipo de recurso de construir el edificio.
       \end{itemize}
    \item \textbf{Reclutar}: Esta acción se encarga de reclutar una unidad.
       \begin{itemize}
          \item Parámetros: una unidad específica, un tipo de unidad, un tipo de edificio y una localización concreta.
-         \item Precondiciones: El tipo de la unidad especifica coincide con el tipo de unidad que queremos reclutar. Para todo tipo de recurso, si el tipo de unidad que queremos reclutar necesita ese tipo de recurso, existe una unidad distinta de tipo VCE que se encarga de extraer ese recurso. Además existe un edificio concreto tal que es del tipo de edificio que recluta el tipo de unidad deseado y ademas esta en la localización. Para toda investigacion si esta permite reclutar al tipo de unidad que queremos reclutar, entonces se ha de haber realizado la investigación. Conseguiremos esto aplicando de nuevo el operador imply.
-         \item Efecto: la unidad reclutada está en la localización. Cuando
+         \item Precondiciones: El tipo de la unidad especifica coincide con el tipo de unidad que queremos reclutar. Para todo tipo de recurso, si el tipo de unidad que queremos reclutar necesita ese tipo de recurso, existe una unidad distinta de tipo VCE que se encarga de extraer ese recurso y además el coste en ese tipo de recursos para reclutar el tipo de unidad es menor que el número de recursos almacenados de ese tipo y menor que el limite de recursos de ese tipo que podemos almacenar. Además existe un edificio concreto tal que es del tipo de edificio que recluta el tipo de unidad deseado y ademas esta en la localización. Para toda investigación si esta permite reclutar al tipo de unidad que queremos reclutar, entonces se ha de haber realizado la investigación.
+         \item Efecto: la unidad reclutada está en la localización. Se decrementa a ALMACENADO de cada tipo de recurso el coste en ese tipo de recurso de reclutar la unidad.
       \end{itemize}
    \item \textbf{Investigar}:
       \begin{itemize}
          \item Parámetros: una entidad de tipo investigación
-         \item Precondiciones: Para todo tipo de recurso, si la investigacion necesita ese tipo de recurso, existe una unidad de tipo VCE que se encarga de extraer ese recurso.
-         \item Efecto: se ha realizado la investigación
+         \item Precondiciones: Para todo tipo de recurso, si la investigación necesita ese tipo de recurso, existe una unidad de tipo VCE que se encarga de extraer ese recurso y además el coste en ese tipo de recursos para realizar la investigación es menor que el número de recursos almacenados de ese tipo y menor que el limite de recursos de ese tipo que podemos almacenar. También deben existir una localización y un edificio tal que el edificio esta en la localización y es de tipo BahiaDeInvestigacion, es decir, para investigar debe existir una bahía de investigación.
+         \item Efecto: Se ha realizado la investigación. Se decrementa a ALMACENADO de cada tipo de recurso el coste en ese tipo de recurso de realizar la investigación.
       \end{itemize}
    \item \textbf{Recolectar}:
          \begin{itemize}
-            \item Parámetros:
-            \item Precondiciones:
-            \item Efecto:
+            \item Parámetros: una unidad concreta, un tipo de recurso y una localización
+            \item Precondiciones: La unidad extrae el tipo de recurso y la unidad esta en la localización. El limite de recursos almacenados de ese tipo debe ser mayor que los recursos almacenados de ese tipo.
+            \item Efecto: Se incrementa ALMACENADO de ese tipo de recurso en 25 unidades. Se ha decidido aumentar el incremento de 10 a 25, porque con 10 el tiempo de ejecución de Metric-FF es inabarcable.
          \end{itemize}
 \end{itemize}
 \subsection{Problema y solución}
-\begin{figure}[H]
-
-   \begin{subfigure}[b]{0.5\textwidth}
-      \centering
-      \includegraphics[width=0.5\textwidth]{Plan61.png}
-   \end{subfigure}
-   \hfill
-   \begin{subfigure}[b]{0.5\textwidth}
-      \centering
-      \includegraphics[width=0.9\textwidth]{Plan62.png}
-   \end{subfigure}
-\end{figure}
+El objetivo de este ejercicio es tener un marine en una localización concreta y un segador y un marine en otra.\\
+Además de todo lo definido en el problema anterior, debemos definir los valores de las funciones numéricas definidas previamente.\\
+Metric-FF encuentra un plan que resuelve correctamente el problema, aunque debido a las restricciones numericas, el numero de pasos y de tiempo necesario para calcular el plan ha aumentado.
