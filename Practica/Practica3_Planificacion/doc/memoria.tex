@@ -12,7 +12,7 @@ Se han definido las constantes \textbf{CentroDeMando} y \textbf{Barracones} del 
    \item El predicado \textit{CAMINO} establece la relación entre dos entidades de tipo localizaciones. Esto permite establecer las conexiones entre las distintas posiciones que componen el mundo representado.
    \item El predicado \textit{EXTRAE} establece la relación entre una entidad de tipo unidad y otra de tipoRecurso. Esta relación establece que una unidad concreta se encuentra extrayendo un tipo de recurso.
    \item El predicado \textit{NECESITA} establece una relación entre una entidad tipoEdificio y otra de tipo tipoRecurso. Establece el tipo de recurso que necesita un tipo de edificio para poder construirse.
-   \item El predicado \textit{ESTIPOEDIFICIO} establece una relación entre una entidad de tipo edificio y otra de tipoEdificio, es decir, especifica el tipo de edificio que es una construccion especifica.
+   \item El predicado \textit{ESTIPOEDIFICIO} establece una relación entre una entidad de tipo edificio y otra de tipoEdificio, es decir, especifica el tipo de edificio que es una construcción especifica.
    \item El predicado \textit{ESTIPOUNIDAD} establece una relación entre una entidad de tipo unidad y otra de tipoUnidad, es decir, especifica el tipo de unidad que es una unidad especifica.
 \end{itemize}
 
@@ -22,7 +22,7 @@ En este nivel se implementan las 3 acciones básicas \textbf{Navegar}, \textbf{A
    \item \textbf{Navegar}: Esta acción se encarga de mover una unidad de una localización a otra adyacente.
       \begin{itemize}
          \item Parámetros: una unidad concreta y dos localizaciones.
-         \item Precondiciones: Debe existir un camino entre las dos localizaciones y la unidad debe estar en la primera localización
+         \item Precondiciones: Debe existir un camino entre las dos localizaciones y la unidad debe estar en la primera localización.
          \item Efecto: La unidad esta en la segunda localización y ya no esta en la primera localización.
       \end{itemize}
    \item \textbf{Asignar}: Esta acción se encarga de asignar una unidad a un tipo de recurso para que lo extraiga en una localización concreta.
@@ -59,7 +59,7 @@ Se ha añadido la constante \textbf{Extractor} para representar el nuevo tipo de
       \item Precondiciones: La unidad debe estar en la localización y también debe existir ese tipo de recurso en la misma. Además deben cumplirse dos condiciones, o en la localización no hay un tipo de recurso Gas o existe un edificio en la localización es de tipo Extractor.
       \item Efecto: La unidad extrae el tipo de recurso
    \end{itemize}
-   \end{itemize}
+\end{itemize}
 \subsection{Problema y solución}
 El objetivo de este ejercicio es construir un barracón en una localización concreta.\\
 Además de todo lo definido en el problema anterior, debemos definir el tipo de recurso necesario para construir un extractor.\\
@@ -111,7 +111,7 @@ Se han definido las constantes \textbf{Marines} y \textbf{Segadores} del tipo ti
    \item \textbf{Reclutar}: Esta acción se encarga de reclutar una unidad.
    \begin{itemize}
       \item Parámetros: una unidad específica, un tipo de unidad, un tipo de edificio y una localización concreta.
-      \item Precondiciones: El tipo de la unidad especifica coincide con el tipo de unidad que . Para todo tipo de recurso, si el tipo de unidad que queremos reclutar necesita ese tipo de recurso, existe una unidad distinta de tipo VCE que se encarga de extraer ese recurso. Además existe un edificio concreto tal que es del tipo de edificio que recluta el tipo de unidad deseado y ademas esta en la localización.
+      \item Precondiciones: El tipo de la unidad especifica coincide con el tipo de unidad que queremos reclutar. Para todo tipo de recurso, si el tipo de unidad que queremos reclutar necesita ese tipo de recurso, existe una unidad distinta de tipo VCE que se encarga de extraer ese recurso. Además existe un edificio concreto tal que es del tipo de edificio que recluta el tipo de unidad deseado y ademas esta en la localización.
       \item Efecto: la unidad reclutada está en la localización.
    \end{itemize}
 \end{itemize}
@@ -121,27 +121,104 @@ Además de todo lo definido en el problema anterior, ahora comenzamos solo con u
 Metric-FF encuentra un plan basado en asignar el vce a recoger minerales, reclutar otro vce en el centro de mando, construir un extractor, construir un barracón y reclutar un marine en el, mover este marine a donde corresponde, asignar al vce a extraer gas y reclutar otro marine y un segador.
 \begin{figure}[H]
    \centering
-   \includegraphics[width=\textwidth]{Plan5.png}
+   \includegraphics[width=\textwidth]{Plan4.png}
 \end{figure}
 
 
 \section{Ejercicio 5}
 
 \subsection{Tipos y constantes}
+Se ha añadido el tipo principal \textbf{investigacion} que representa las investigaciones existentes.
+\\\\
+También se ha añadido la constante \textbf{BahiaDeInvestigacion}
 \subsection{Predicados}
+\begin{itemize}
+   \item El predicado \textit{NECESITAINV} establece una relación entre una investigación y el tipo de recurso que es necesario para poder realizarla.
+   \item El predicado \textit{INVESTIGADO} simplemente sirve para indicar si una investigación ha sido realizada.
+   \item El predicado \textit{PERMITE} establece una relación entre una investigación y un tipo de unidad. Establece la necesidad de haber realizado una investigación previamente para poder reclutar una unidad.
+\end{itemize}
 \subsection{Acciones}
+\begin{itemize}
+   \item \textbf{Reclutar}: Esta acción se encarga de reclutar una unidad.
+   \begin{itemize}
+      \item Parámetros: una unidad específica, un tipo de unidad, un tipo de edificio y una localización concreta.
+      \item Precondiciones: El tipo de la unidad especifica coincide con el tipo de unidad que queremos reclutar. Para todo tipo de recurso, si el tipo de unidad que queremos reclutar necesita ese tipo de recurso, existe una unidad distinta de tipo VCE que se encarga de extraer ese recurso. Además existe un edificio concreto tal que es del tipo de edificio que recluta el tipo de unidad deseado y ademas esta en la localización. Para toda investigacion si esta permite reclutar al tipo de unidad que queremos reclutar, entonces se ha de haber realizado la investigación. Conseguiremos esto aplicando de nuevo el operador imply.
+      \item Efecto: la unidad reclutada está en la localización.
+   \end{itemize}
+   \item \textbf{Investigar}:
+   \begin{itemize}
+      \item Parámetros: una entidad de tipo investigación
+      \item Precondiciones: Para todo tipo de recurso, si la investigacion necesita ese tipo de recurso, existe una unidad de tipo VCE que se encarga de extraer ese recurso. También deben existir una localización y un edificio tal que
+      \item Efecto: se ha realizado la investigación
+   \end{itemize}
+\end{itemize}
 \subsection{Problema y solución}
+El objetivo de este ejercicio es tener un marine en una localización concreta y un segador y un marine en otra.\\
+Además de todo lo definido en el problema anterior, debemos establecer que recursos son necesarios para realizar las investigaciones y que investigaciones permiten reclutar que tipo de unidades. Tambien debemos definir y colocar una bahia de investigación\\
+Metric-FF encuentra un plan basado en asignar el vce a recoger minerales, reclutar otro vce en el centro de mando, construir un extractor, construir un barracón y reclutar un marine en el, mover este marine a donde corresponde, asignar al vce a extraer gas y reclutar otro marine y un segador.
 \begin{figure}[H]
    \centering
-   \includegraphics[width=\textwidth]{Plan1.png}
+   \includegraphics[width=\textwidth]{Plan5.png}
 \end{figure}
 
 
 \section{Ejercicio 6}
-
 \subsection{Tipos y constantes}
-\subsection{Predicados}
+Se ha añadido el tipo principal \textbf{investigacion} que representa las investigaciones existentes.
+\subsection{Funciones}
+Para poder trabajar con datos numericos, en PDDL es necesario definir funciones:
+\begin{itemize}
+   \item La función \textit{COSTE} contiene el coste según un tipo de recurso para una entidad de tipo construible.
+   \item La función \textit{COSTEINV} contiene el coste según un tipo de recurso para una entidad de tipo investigación.
+   \item La función \textit{INCREMENTALIMITE} contiene cuanto aumenta el limite máximo de recursos que se puede almacenar cuando se construye un edificio.
+   \item La función \textit{LIMITE} contiene el limite de unidades de un tipo de recurso que se puede almacenar.
+   \item La función \textit{ALMACENADO} contiene el numero de unidades almacenadas de un tipo de recurso.
+\end{itemize}
 \subsection{Acciones}
+\begin{itemize}
+   \item \textbf{Navegar}:
+      \begin{itemize}
+         \item Parámetros: una unidad concreta y dos localizaciones.
+         \item Precondiciones: Debe existir un camino entre las dos localizaciones y la unidad debe estar en la primera localización. Ademas ahora debe ser cierto que para todo tipo de recurso, la unidad no esta extrayendo dicho tipo de recurso.
+         \item Efecto: La unidad esta en la segunda localización y ya no esta en la primera localización.
+      \end{itemize}
+   \item \textbf{Asignar}:
+      \begin{itemize}
+         \item Parámetros: Una unidad concreta, un tipo de recurso y una localización.
+         \item Precondiciones: La unidad debe estar en la localización y también debe existir ese tipo de recurso en la misma. Deben cumplirse dos condiciones, o en la localización no hay un tipo de recurso Gas o existe un edificio en la localización es de tipo Extractor. Ademas ahora debe ser cierto que para todo tipo de recurso, la unidad no esta extrayendo dicho tipo de recurso.
+         \item Efecto: La unidad extrae el tipo de recurso
+      \end{itemize}
+   \item \textbf{Desasignar}:
+         \begin{itemize}
+            \item Parámetros: Una unidad concreta, un tipo de recurso y una localización.
+            \item Precondiciones: La unidad y el tipo de recurso se encuentran en la localización y la unidad esta extrayendo dicho tipo de recurso.
+            \item Efecto: La unidad ya no extrae el tipo de recurso
+         \end{itemize}
+   \item \textbf{Construir}: Esta acción se encarga de construir un edificio en una localización.
+      \begin{itemize}
+         \item Parámetros: una unidad y edificio específicos, un tipo de edificio y una localización.
+         \item Precondiciones: Para todo tipo de recurso la unidad que construye no esta extrayendo ninguno (la unidad esta libre). La unidad debe estar en la localización donde se quiere construir. El edificio debe ser del tipo de edificio deseado. Ahora se debe cumplir que para todo tipo de recuro si el tipo de edificio necesita el tipo de recurso para construirse, existe una unidad diferente a la que construye que se encarga de extraerlo y ademas esta unidad es un VCE y además el coste en ese tipo de recursos para construir el tipo de edificio es menor que el número de recursos almacenados de ese tipo y menor que el limite de recursos de ese tipo que podemos almacenar. De esta manera conseguiremos que el limite de recursos que podemos almacenar siempre sea mayor que el coste más alto, reduciendo el espacio de búsqueda. También la unidad que se encarga de construir debe ser de tipo VCE.
+         \item Efecto: El edificio se encuentra construido en la localización.
+      \end{itemize}
+   \item \textbf{Reclutar}: Esta acción se encarga de reclutar una unidad.
+      \begin{itemize}
+         \item Parámetros: una unidad específica, un tipo de unidad, un tipo de edificio y una localización concreta.
+         \item Precondiciones: El tipo de la unidad especifica coincide con el tipo de unidad que queremos reclutar. Para todo tipo de recurso, si el tipo de unidad que queremos reclutar necesita ese tipo de recurso, existe una unidad distinta de tipo VCE que se encarga de extraer ese recurso. Además existe un edificio concreto tal que es del tipo de edificio que recluta el tipo de unidad deseado y ademas esta en la localización. Para toda investigacion si esta permite reclutar al tipo de unidad que queremos reclutar, entonces se ha de haber realizado la investigación. Conseguiremos esto aplicando de nuevo el operador imply.
+         \item Efecto: la unidad reclutada está en la localización. Cuando
+      \end{itemize}
+   \item \textbf{Investigar}:
+      \begin{itemize}
+         \item Parámetros: una entidad de tipo investigación
+         \item Precondiciones: Para todo tipo de recurso, si la investigacion necesita ese tipo de recurso, existe una unidad de tipo VCE que se encarga de extraer ese recurso.
+         \item Efecto: se ha realizado la investigación
+      \end{itemize}
+   \item \textbf{Recolectar}:
+         \begin{itemize}
+            \item Parámetros:
+            \item Precondiciones:
+            \item Efecto:
+         \end{itemize}
+\end{itemize}
 \subsection{Problema y solución}
 \begin{figure}[H]
 

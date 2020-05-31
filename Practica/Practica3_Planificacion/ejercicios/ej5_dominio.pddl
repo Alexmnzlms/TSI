@@ -121,10 +121,9 @@
                     (en ?e ?x)
                 )   
             )
-            (or
-                (not (esTipoUnidad ?u Segadores))
-                (exists (?i - investigacion)
-                    (and
+            (forall (?i - investigacion)
+                (and
+                    (imply
                         (permite ?i ?tu)
                         (investigado ?i)
                     )
@@ -151,6 +150,12 @@
                             )
                         )
                     )
+                )
+            )
+            (exists (?x - localizacion ?e - edificio) 
+                (and
+                    (en ?e ?x)
+                    (esTipoEdificio ?e BahiaDeInvestigacion)
                 )
             )
         )
