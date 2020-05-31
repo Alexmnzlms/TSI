@@ -110,7 +110,6 @@
     (:goal
         (and
             (en barracon c4_1)
-            (en centro c5_3)
         )
     )
 )

@@ -109,7 +109,6 @@
     (:goal
         (and
             (en barracon c4_1)
-            (extrae vce1 GAS)
         )
     )
 )
