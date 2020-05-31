@@ -1,0 +1,72 @@
+En esta memoria se detallarán las decisiones tomadas en la realización de los ejercicios propuestos de planificación con PDDL. En el ejercicio 1 se detallarán las características del dominio en su totalidad, mientras que en los siguientes solo se hará mención a los cambios realzados en el mismo, entendiendo que las partes no mencionadas permanecen inalteradas.
+
+\section{Ejercicio 1}
+\subsection{Tipos}
+Se han definido dos tipos principales: \textbf{Posicinable} y \textbf{Localizaciones}. El tipo Localizaciones representa las posibles posiciones dentro de la matriz del mundo dentro de la que las unidades, edificios y recursos pueden encontrarse. El tipo Posicionable es un supertipo para los subtipos de \textbf{unidad}, \textbf{edificio}, \textbf{tipoUnidad}, \textbf{tipoRecurso}, \textbf{tipoEdificio}. El supertipo Posicionable representa objetos del dominio/problema que pueden ocupar una posición en el mundo. Los subtipos unidad y edificio representan a unidades y edificios concretos, mientras que los tipos tipoX representan el tipo de la entidad X. Notar que existe un tipo llamado tipoRecurso pero no uno llamado recurso, esto es debido a que las unidades y edificios pueden tener instancias concretas, mientras que para representar los recursos simplemente necesitamos asociar un tipo de recurso a una casilla concreta, sin necesidad de crear una instancia concreta del mismo.
+
+\subsubsection{Constantes}
+Se han definido las constantes \textbf{CentroDeMando} y \textbf{Barracones} del tipo tipoEdificio, \textbf{VCE} del tipo tipoUnidad y \textbf{Minerales} y \textbf{Gas} del tipo tipoRecurso.
+
+\subsection{Predicados}
+\begin{itemize}
+   \item El predicado \textit{EN} establece la relación entre una entidad de tipo Posicionable y una entidad de tipo Localizaciones, es decir, establece la posición de una entidad concreta en una localización concreta.
+   \item El predicado \textit{CAMINO} establece la relación entre dos entidades de tipo Localizaciones. Esto permite establecer las conexiones entre las distintas posiciones que componen el mundo representado.
+   \item El predicado \textit{EXTRAE} establece la relación entre una entidad de tipo unidad y otra de tipoRecurso. Esta relación establece que una unidad concreta se encuentra extrayendo un tipo de recurso.
+   \item El predicado \textit{NECESITA} establece una relación entre una entidad tipoEdificio y otra de tipo tipoRecurso. Establece el tipo de recurso que necesita un tipo de edificio para poder construirse.
+   \item El predicado \textit{ESTIPOEDIFICIO} establece una relación entre una entidad de tipo edificio y otra de tipoEdificio, es decir, especifica el tipo de edificio que es una construccion especifica.
+   \item El predicado \textit{ESTIPOUNIDAD} establece una relación entre una entidad de tipo unidad y otra de tipoUnidad, es decir, especifica el tipo de unidad que es una unidad especifica.
+\end{itemize}
+
+\subsection{Acciones}
+En este nivel se implementan las 3 acciones básicas \textbf{Navegar}, \textbf{Asignar} y \textbf{Construir}
+\begin{itemize}
+   \item \textbf{Navegar}:
+      \begin{itemize}
+         \item Parametros:
+         \item Precondiciones:
+         \item Efecto:
+      \end{itemize}
+   \item \textbf{Asignar}:
+   \item \textbf{Construir}:
+\end{itemize}
+\subsection{Problema y solución}
+
+\section{Ejercicio 2}
+
+\subsection{Tipos}
+\subsubsection{Constantes}
+\subsection{Predicados}
+\subsection{Acciones}
+\subsection{Problema y solución}
+
+\section{Ejercicio 3}
+
+\subsection{Tipos}
+\subsubsection{Constantes}
+\subsection{Predicados}
+\subsection{Acciones}
+\subsection{Problema y solución}
+
+\section{Ejercicio 4}
+
+\subsection{Tipos}
+\subsubsection{Constantes}
+\subsection{Predicados}
+\subsection{Acciones}
+\subsection{Problema y solución}
+
+\section{Ejercicio 5}
+
+\subsection{Tipos}
+\subsubsection{Constantes}
+\subsection{Predicados}
+\subsection{Acciones}
+\subsection{Problema y solución}
+
+\section{Ejercicio 6}
+
+\subsection{Tipos}
+\subsubsection{Constantes}
+\subsection{Predicados}
+\subsection{Acciones}
+\subsection{Problema y solución}

@@ -5,7 +5,7 @@
        unidad edificio tipoUnidad tipoEdificio tipoRecurso - posicionable
    )
    (:constants 
-      CentroDeMando Barracones Extractor - tipoEdificio
+      CentroDeMando Barracones - tipoEdificio
       VCE - tipoUnidad
       Minerales Gas - tipoRecurso
    )
