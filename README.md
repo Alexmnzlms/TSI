@@ -1,5 +1,5 @@
 # TSI
-Tecnicas de los Sistemas Inteligentes
+Técnicas de los Sistemas Inteligentes
 
 ## Prácticas
 
